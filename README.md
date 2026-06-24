@@ -1,5 +1,5 @@
-Nacka Företagarträff - AI Matchmaking App 🚀
-This is a modern web application created to maximize networking during the Nacka Företagarträff trade fair. The app uses an AI mockup to pair up participants based on their expertise, challenges, and interests.
+Nacka Företagarträff - AI Matchmaking App 
+🚀 This is a modern web application created to maximize networking during the Nacka Företagarträff trade fair. The app uses an AI mockup to pair up participants based on their expertise, challenges, and interests.
 
 NOTE: This project has been converted from Vanilla JS to Angular.
 
