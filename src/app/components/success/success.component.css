@@ -1,0 +1,18 @@
+.glass-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 48px);
+}
+
+.description {
+  text-align: center;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+h1 {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}

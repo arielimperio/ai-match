@@ -1,0 +1,32 @@
+<div id="app">
+  <router-outlet></router-outlet>
+</div>
+
+<app-notification></app-notification>
+
+@if (isAuthorizedForToggle() && !isSelectCompanyView() && showToggle()) {
+  <div class="fixed bottom-4 right-4 z-[9999] flex items-center gap-2 p-1.5 bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+    
+    @if (!isAdminView()) {
+      <!-- Back to Admin View Pill -->
+      <button (click)="toggleView()" 
+              class="flex items-center gap-3 px-4 py-2 rounded-xl bg-primary text-white hover:opacity-90 transition-all shadow-xl group/btn">
+        <span class="text-[10px] font-black uppercase tracking-[0.15em] px-1">Back to Admin View</span>
+        <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
+          <span class="material-icons text-[18px]">admin_panel_settings</span>
+        </div>
+      </button>
+    } @else {
+      <!-- Preview User View Pill -->
+      <button (click)="toggleView()" 
+              class="flex items-center gap-3 px-4 py-2 rounded-xl bg-[#0f172a] text-white hover:bg-black/40 transition-all shadow-xl border border-white/5 group/btn">
+        <span class="text-[10px] font-black uppercase tracking-[0.15em] px-1">Preview User View</span>
+        <div class="w-8 h-8 rounded-lg bg-[#6366f1] flex items-center justify-center text-white shadow-indigo-500/20 shadow-lg">
+          <span class="material-icons text-[18px]">visibility</span>
+        </div>
+      </button>
+    }
+  </div>
+}
+
+<!-- <div class="site-footer">Copyright &copy; 2026 ITmaskinen AB</div> -->

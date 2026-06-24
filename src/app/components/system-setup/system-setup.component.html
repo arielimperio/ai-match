@@ -1,0 +1,113 @@
+<div class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+
+  <div
+    class="bg-transparent p-10 w-full max-w-[420px] relative z-10 animate-in fade-in zoom-in-95 duration-700 border border-white/10 rounded-[32px]">
+
+    <!-- Top Brand -->
+    <div class="text-center mb-10 group">
+      <div class="relative inline-block mb-10">
+        <!-- Logo Glow Backdrop -->
+        <div
+          class="absolute -inset-8 bg-indigo-500/10 blur-3xl rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-1000">
+        </div>
+        <div class="absolute -inset-3 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 opacity-50">
+        </div>
+
+        <img src="assets/mint-logo.png" alt="Insight Engine Logo"
+          class="relative h-12 w-auto mx-auto object-contain logo-img transition-all duration-700 hover:scale-110 logo-glow-active">
+      </div>
+
+      <h1
+        class="text-white text-[32px] font-black uppercase tracking-tight mb-2 bg-gradient-to-br from-white via-indigo-100 to-white/60 bg-clip-text text-transparent">
+        Setup Account
+      </h1>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #setupForm="ngForm" class="space-y-6">
+
+
+      <!-- First Name -->
+      <div class="space-y-2">
+        <label class="block text-white/60 text-sm font-bold ml-1">First Name</label>
+        <input type="text" [(ngModel)]="setupData().firstName" name="firstName"
+          class="w-full h-14 px-4 rounded-2xl border border-white/5 bg-white/5 text-white text-[15px] transition-all outline-none focus:border-blue-500/50 focus:bg-white/10 placeholder:text-white/20"
+          placeholder="Your first name" required>
+      </div>
+
+      <!-- Last Name -->
+      <div class="space-y-2">
+        <label class="block text-white/60 text-sm font-bold ml-1">Last Name</label>
+        <input type="text" [(ngModel)]="setupData().lastName" name="lastName"
+          class="w-full h-14 px-4 rounded-2xl border border-white/5 bg-white/5 text-white text-[15px] transition-all outline-none focus:border-blue-500/50 focus:bg-white/10 placeholder:text-white/20"
+          placeholder="Your last name" required>
+      </div>
+
+      <!-- Email -->
+      <div class="space-y-2">
+        <label class="block text-white/60 text-sm font-bold ml-1">Email</label>
+        <input type="email" [(ngModel)]="setupData().email" name="email"
+          class="w-full h-14 px-4 rounded-2xl border border-white/5 bg-white/5 text-white text-[15px] transition-all outline-none focus:border-blue-500/50 focus:bg-white/10 placeholder:text-white/20"
+          placeholder="name@company.com" required>
+      </div>
+
+      <!-- Password -->
+      <div class="space-y-2">
+        <label class="block text-white/60 text-sm font-bold ml-1">Password</label>
+        <div class="relative">
+          <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="setupData().password" name="password"
+            class="w-full h-14 px-4 pr-12 rounded-2xl border border-white/5 bg-white/5 text-white text-[15px] transition-all outline-none focus:border-blue-500/50 focus:bg-white/10 placeholder:text-white/20"
+            placeholder="••••••••" required>
+          <button type="button" (click)="togglePasswordVisibility()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors focus:outline-none">
+            <span class="material-icons text-[20px]">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <p class="text-[12px] text-white/40 font-medium italic mt-2 ml-1">Password must be at least 6 characters</p>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="space-y-2">
+        <label class="block text-white/60 text-sm font-bold ml-1">Confirm Password</label>
+        <div class="relative">
+          <input [type]="showConfirmPassword() ? 'text' : 'password'" [(ngModel)]="setupData().confirmPassword" name="confirmPassword"
+            class="w-full h-14 px-4 pr-12 rounded-2xl border border-white/5 bg-white/5 text-white text-[15px] transition-all outline-none focus:border-blue-500/50 focus:bg-white/10 placeholder:text-white/20"
+            placeholder="••••••••" required>
+          <button type="button" (click)="toggleConfirmPasswordVisibility()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors focus:outline-none">
+            <span class="material-icons text-[20px]">{{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+      </div>
+
+
+      <!-- Actions -->
+      <div class="space-y-4 pt-4">
+        <!-- Submit button -->
+        <button type="submit" [disabled]="isSubmitting() || !setupForm.form.valid"
+          class="w-full h-14 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+          @if (isSubmitting()) {
+          <div class="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+          <span>Creating Account...</span>
+          } @else {
+          <span>Create Account</span>
+          }
+        </button>
+
+        <!-- Switch to Login -->
+        <button type="button" routerLink="/login"
+          class="w-full h-14 bg-slate-900/40 border border-white/5 hover:bg-slate-900/60 text-white font-bold rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+          <span>Switch to Sign In</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-8 text-center border-t border-white/5 pt-8">
+        <a href="https://itmaskinen.se/" target="_blank" rel="noopener noreferrer"
+          class="text-[10px] text-white/40 hover:text-white/60 transition-colors uppercase tracking-[0.2em] font-bold block no-underline transition-opacity">
+          &copy; 2026 ITmaskinen Sverige AB. All rights reserved.
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>

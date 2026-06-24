@@ -1,0 +1,38 @@
+<div class="glass-container">
+  <header class="mb-4 text-left">
+    @if (dynamicLogo() && dynamicLogo()!.trim().startsWith('<')) {
+    <div class="logo-wrapper mb-4 flex justify-center items-center w-full overflow-hidden max-h-[120px]" [innerHTML]="sanitizedLogo()"></div>
+    } @else if (dynamicLogo()) {
+    <img [src]="dynamicLogo()" alt="Logo" class="logo-img block mx-auto mb-6 w-auto max-w-full"
+      style="max-height:120px">
+    }
+    <div class="text-xs font-bold text-text-muted tracking-[1.5px] uppercase opacity-80">
+      {{ dynamicTagline() || '' }}
+    </div>
+  </header>
+
+  <h1>{{ welcomeTitle() }}</h1>
+  <div class="description-content mb-10" [innerHTML]="dynamicDescription() || ''"></div>
+
+  <button class="btn-primary" (click)="start()" [disabled]="isLoadingQuestions()">
+    {{ isLoadingQuestions() ? 'Loading questions...' : (dynamicButton() || '') }}
+    @if (!isLoadingQuestions() && dynamicButton()) {
+    <span>→</span>
+    }
+  </button>
+
+  @if (showClosedAlert()) {
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000]"
+    (click)="closeAlert()">
+    <div
+      class="bg-[rgba(30,41,59,0.95)] border border-white/10 rounded-[20px] p-8 max-w-[400px] w-[90%] text-center shadow-2xl"
+      (click)="$event.stopPropagation()">
+      <div class="text-5xl mb-4" style="filter:drop-shadow(0 0 10px rgba(239,68,68,0.3))">🔒</div>
+      <h3 class="text-white mt-0 mb-3 text-xl">The survey is closed</h3>
+      <p class="text-[#94a3b8] text-sm leading-snug mb-6">We are currently not accepting more responses. Please contact the administrator
+        if you believe this is an error.</p>
+      <button class="btn-primary w-full justify-center" (click)="closeAlert()">OK, I understand</button>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,38 @@
+<div class="glass-container">
+  <header class="mb-4 text-left">
+    @if (dynamicLogo() && dynamicLogo()!.trim().startsWith('<')) {
+      <div class="logo-wrapper mb-4 flex justify-center items-center w-full" [innerHTML]="sanitizedLogo()"></div>
+    } @else if (dynamicLogo()) {
+      <img [src]="dynamicLogo()" alt="Logo" class="logo-img block mx-auto mb-6 w-auto max-w-full" style="max-height:120px">
+    }
+  </header>
+
+  <h1>{{ selectionTitle() }}</h1>
+  <p class="description-content mb-8">
+    {{ selectionDescription() }}
+  </p>
+
+  <div class="roles-grid">
+    <button class="role-card" (click)="selectRole('Student')">
+      <div class="role-icon">🎓</div>
+      <div class="role-info">
+        <h3>{{ studentName() }}</h3>
+        <p>{{ studentDescription() }}</p>
+      </div>
+      <span class="material-icons arrow">chevron_right</span>
+    </button>
+
+    <button class="role-card" (click)="selectRole('Company')">
+      <div class="role-icon">🏢</div>
+      <div class="role-info">
+        <h3>{{ companyName() }}</h3>
+        <p>{{ companyDescription() }}</p>
+      </div>
+      <span class="material-icons arrow">chevron_right</span>
+    </button>
+  </div>
+
+  <div class="mt-10 pt-6 border-t border-white/10 text-center">
+    <p class="text-[10px] uppercase tracking-widest text-[#94a3b8] font-bold opacity-60">In collaboration with ITmaskinen</p>
+  </div>
+</div>

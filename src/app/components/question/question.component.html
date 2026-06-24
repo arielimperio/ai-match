@@ -1,0 +1,92 @@
+@if (service.isLoadingQuestions() || !content()) {
+<div class="glass-container flex flex-col items-center justify-center min-h-[350px] gap-4">
+  <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+  <p class="text-text-muted text-sm font-medium animate-pulse">Loading question...</p>
+</div>
+} @else {
+<div class="glass-container">
+  <!-- Progress bar -->
+  <div class="mb-10 h-1 bg-white/10 rounded-sm">
+    <div class="h-full bg-primary rounded-sm transition-all" [style.width.%]="progress()"></div>
+  </div>
+
+  <h1>{{ content().title }}</h1>
+  <p class="description">{{ content().description }}</p>
+
+  @if (content().type === 'Text') {
+  <!-- Free text answer -->
+  <div class="my-6 relative input-group">
+    <textarea [value]="service.answers().dynamic[currentQId()] || ''" (input)="updateText($event)"
+      [placeholder]="content().placeholder || ''" rows="4" class="w-full"
+      [maxLength]="content().maxLength || 1000"></textarea>
+    @if (content().maxLength) {
+    <div class="char-counter absolute bottom-3 right-3 text-xs text-white/50 pointer-events-none transition-colors"
+      [class.near-limit]="(service.answers().dynamic[currentQId()]?.length || 0) > (content().maxLength || 0) * 0.9">
+      {{ service.answers().dynamic[currentQId()]?.length || 0 }} / {{ content().maxLength }}
+    </div>
+    }
+  </div>
+
+  } @else {
+  <!-- Selection counter -->
+  @if (content().type === 'MultipleChoice' && content().maxLength) {
+  <div class="text-right text-xs text-white/50 mb-2 transition-colors selection-counter"
+    [class.near-limit]="(service.answers().dynamic[currentQId()]?.split(',')?.length || 0) >= (content().maxLength || 0)">
+    {{ service.answers().dynamic[currentQId()] ? (service.answers().dynamic[currentQId()].split(',').length) : 0 }} /
+    {{ content().maxLength }} {{ selectedText() }}
+  </div>
+  }
+
+  <!-- Options grid -->
+  <div class="flex flex-col gap-4 mt-6">
+    @for (opt of content().options; track opt.id) {
+    <div
+      class="option-card flex items-center gap-5 p-5 rounded-2xl border border-white/10 bg-white/[0.05] cursor-pointer transition-all hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/30 hover:shadow-lg"
+      [class.selected]="isSelected(opt.id)" (click)="selectOption(opt.id)">
+      <div class="text-3xl shrink-0 w-10 h-10 flex items-center justify-center drop-shadow-md option-icon">
+        @if (opt.icon && opt.icon.startsWith('/assets/')) {
+        <img [src]="opt.icon" [alt]="opt.title" class="w-full h-full object-contain">
+        } @else {
+        {{ opt.icon || '✦' }}
+        }
+      </div>
+      <div class="flex-1 option-content-main">
+        <div class="option-text">
+          <h3 class="text-[17px] font-bold text-white mb-1">{{ opt.title }}</h3>
+          @if (opt.desc) {
+          <p class="text-sm text-slate-300 m-0">{{ opt.desc }}</p>
+          }
+        </div>
+      </div>
+      <div
+        class="w-5 h-5 border-2 border-white/20 flex items-center justify-center shrink-0 transition-all selection-indicator"
+        [class.multiple]="content().type === 'MultipleChoice'" [class.single]="content().type === 'Choice'">
+        <div class="indicator-inner"></div>
+      </div>
+    </div>
+    }
+  </div>
+
+  @if (isSelected('other')) {
+  <div class="mt-4">
+    <label>{{ otherLabel() }}</label>
+    <textarea [value]="otherValue()" (input)="updateOther($event)" [placeholder]="otherPlaceholder()"
+      maxlength="50" rows="3" class="w-full mt-2 resize-y"></textarea>
+  </div>
+  }
+  }
+
+  <div class="button-group mt-auto pt-6">
+    <button class="btn btn-secondary flex-1" (click)="back()">
+      @if (backLabel()) {
+      <span>←</span> {{ backLabel() }}
+      }
+    </button>
+    <button class="btn-primary flex-[1.6]" (click)="next()">
+      @if (nextLabel()) {
+      {{ nextLabel() }} <span>→</span>
+      }
+    </button>
+  </div>
+</div>
+}

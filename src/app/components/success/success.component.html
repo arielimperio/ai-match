@@ -1,0 +1,58 @@
+<div class="glass-container text-center items-center">
+  <!-- Success icon -->
+  <div class="flex items-center justify-center mb-8">
+    <div class="w-20 h-20 rounded-full bg-[#1e293b] flex items-center justify-center border border-[#31a2ae]/20">
+      <svg class="w-10 h-10 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+  </div>
+
+  <h1 class="text-3xl font-bold mb-6">Complete!</h1>
+  <p class="description mb-6 max-w-[280px] mx-auto text-center">Here is how you will be
+    presented to other participants:
+  </p>
+
+  <!-- Profile preview card -->
+  <div
+    class="w-full flex flex-col items-start gap-3 text-left mb-6 p-5 rounded-2xl border border-primary bg-[rgba(79,70,229,0.05)]">
+    <div class="flex items-center gap-3 w-full">
+      <div
+        class="w-16 h-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-xl border-2 border-primary"
+        style="background: linear-gradient(135deg, var(--primary), var(--secondary))">
+        @if (service.answers().photo) {
+        <img [src]="service.answers().photo" class="w-full h-full object-cover">
+        } @else {
+        {{ service.answers().firstName[0] }}
+        }
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg mb-0.5">{{ service.answers().firstName }} {{ service.answers().lastName }}</h3>
+        @if (service.answers().title) {
+        <p class="text-sm text-text-muted mb-0.5">{{ service.answers().title }}</p>
+        }
+        <p class="text-sm text-text-muted">{{ service.answers().company || 'Participant' }}</p>
+      </div>
+    </div>
+
+    <div class="w-full h-px bg-[var(--card-border)]"></div>
+
+    @if (bioDisplay()) {
+    <div>
+      <div class="text-[11px] text-text-muted uppercase tracking-wide mb-1">About you</div>
+      <p class="text-[13px] text-text-muted">{{ bioDisplay() }}</p>
+    </div>
+    }
+    @if (companyDescriptionDisplay()) {
+    <div>
+      <div class="text-[11px] text-text-muted uppercase tracking-wide mb-1">About the company</div>
+      <p class="text-[13px] text-text-muted">{{ companyDescriptionDisplay() }}</p>
+    </div>
+    }
+  </div>
+
+  <!-- <p class="description text-sm mb-5 text-left">{{ successMessage() }}</p> -->
+
+  <!-- <p class="text-text-muted text-sm mt-auto pt-6">See you at Nacka Företagarträff</p> -->
+</div>

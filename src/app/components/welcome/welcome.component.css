@@ -1,0 +1,117 @@
+/* Only ::ng-deep and pseudo-element styles */
+
+/* ::ng-deep for SVG/img logo */
+.logo-img,
+.logo-wrapper ::ng-deep svg,
+.logo-wrapper ::ng-deep img {
+  width: auto;
+  max-width: 100%;
+  max-height: 120px;
+  display: block;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+/* ::ng-deep rich text description */
+.description-content ::ng-deep h2,
+.description-content ::ng-deep h3,
+.description-content ::ng-deep h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.description-content ::ng-deep p {
+  margin-bottom: 6px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.description-content ::ng-deep ol,
+.description-content ::ng-deep ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.description-content ::ng-deep li {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.description-content ::ng-deep p:empty,
+.description-content ::ng-deep *:empty,
+.description-content ::ng-deep br+br {
+  display: none;
+}
+
+.description-content ::ng-deep li strong {
+  color: #fff;
+}
+
+.description-content ::ng-deep .info-block {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* Modal entry animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 52px !important;
+  line-height: normal !important;
+  padding: 0 32px !important;
+  width: 100% !important;
+  gap: 10px !important;
+}
+
+.btn-primary span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin-top: -1px;
+  /* Micro-adjustment for the arrow alignment */
+}
+
+.collab-section a {
+  text-decoration: none;
+  cursor: pointer;
+}
+

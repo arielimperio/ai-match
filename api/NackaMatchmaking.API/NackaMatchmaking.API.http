@@ -1,0 +1,6 @@
+@NackaMatchmaking.API_HostAddress = http://localhost:5109
+
+GET {{NackaMatchmaking.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

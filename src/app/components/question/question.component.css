@@ -1,0 +1,79 @@
+/* Only pseudo-element and complex CSS-variable states */
+
+/* Selection indicator complex state */
+.option-card.selected .selection-indicator {
+  border-color: #ffffff;
+  background: var(--primary);
+  border: none;
+}
+
+/* Animated inner indicator dot */
+.indicator-inner {
+  width: 8px;
+  height: 8px;
+  background: white;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.selection-indicator.single .indicator-inner {
+  border-radius: 50%;
+}
+
+/* Checkmark for multiple choice */
+.selection-indicator.multiple .indicator-inner {
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  background: transparent;
+  transform: rotate(-45deg) translate(1px, -1px) scale(0.5);
+  margin-top: -3px;
+}
+
+.option-card.selected .selection-indicator .indicator-inner {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.option-card.selected .selection-indicator.multiple .indicator-inner {
+  transform: rotate(-45deg) translate(1px, -1px) scale(1);
+}
+
+/* option-card uses var(--primary) for selected ring */
+.option-card.selected {
+  background: rgba(79, 70, 229, 0.2);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+}
+
+/* char-counter near limit */
+.char-counter.near-limit,
+.selection-counter.near-limit {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+/* Button consistency with welcome page - target only main nav buttons */
+.button-group .btn,
+.button-group .btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 52px !important;
+  line-height: normal !important;
+  padding: 0 32px !important;
+  gap: 10px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.button-group .btn span,
+.button-group .btn-primary span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin-top: -1px;
+  /* Micro-adjustment for the arrow alignment */
+}

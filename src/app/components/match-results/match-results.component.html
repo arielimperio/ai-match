@@ -1,0 +1,312 @@
+<div class="glass-container flex flex-col">
+
+  <!-- Header -->
+  <div class="text-left w-full mb-8 header">
+    @if (dynamicLogo() && dynamicLogo()!.trim().startsWith('<')) { <div
+      class="logo-wrapper mb-2 inline-block [&_svg]:h-[60px] [&_svg]:w-auto [&_img]:h-[60px] [&_img]:w-auto"
+      [innerHTML]="sanitizedLogo()">
+  </div>
+  } @else if (dynamicLogo()) {
+  <img [src]="dynamicLogo()" alt="Matchmaking Logo" class="h-[60px] w-auto mb-2">
+  }
+  <p class="text-sm text-[#9ca3af] mt-1 tracking-widest font-medium">YOUR MATCHES</p>
+  @if (participantName()) {
+  <p class="text-[1.1rem] text-primary mt-1.5 font-semibold text-right">{{ participantName() }}</p>
+  }
+</div>
+
+<!-- Tabs Switcher (Only if schedule is configured AND user is a company) -->
+@if (hasScheduleConfig() && isCompanyRole()) {
+<div class="flex gap-2 p-1 rounded-2xl border border-white/10 bg-white/[0.03] overflow-x-auto mb-6">
+  <button class="tab-item shrink-0 flex-1 justify-center" [class.active]="activeTab() === 'matches'" (click)="activeTab.set('matches')">
+     <span class="material-icons text-base">people</span> Matches
+  </button>
+  <button class="tab-item shrink-0 flex-1 justify-center" [class.active]="activeTab() === 'schedule'" (click)="activeTab.set('schedule')">
+     <span class="material-icons text-base">event</span> Schedule
+  </button>
+</div>
+}
+
+@if (activeTab() === 'matches') {
+<!-- Matches list -->
+<div class="flex flex-col gap-5 w-full">
+  @if (isLoading()) {
+  <div class="py-16 text-center text-[#9ca3af]">Loading matches...</div>
+  } @else if (error()) {
+  <div class="text-red-400 text-center py-8">{{ error() }}</div>
+  } @else {
+
+  <!-- Event Feedback Card — only visible if the feedback request email has been sent to this participant -->
+  @if (feedbackRequestSent()) {
+  <div class="match-card bg-[rgba(30,41,59,0.4)] border border-white/[0.08] rounded-[20px] p-6 backdrop-blur-2xl">
+    <h3 class="text-base font-bold text-white mb-4 tracking-wide uppercase">
+      What do you think of this year's matchmaking?
+    </h3>
+
+    <!-- Star rating -->
+    <div class="flex gap-2 mb-5">
+      @for (star of [1,2,3,4,5]; track star) {
+      <button type="button" (click)="setEventRating(star)"
+        class="p-0.5 transition-transform hover:scale-110 focus:outline-none" [attr.aria-label]="'Rating ' + star"
+        [attr.title]="'Rating ' + star">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 transition-colors duration-150" viewBox="0 0 24 24"
+          [attr.fill]="star <= eventRating() ? '#f59e0b' : 'none'"
+          [attr.stroke]="star <= eventRating() ? '#f59e0b' : '#6b7280'" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      </button>
+      }
+    </div>
+
+    <!-- Comment input + send -->
+    <div
+      class="relative bg-white/[0.05] border border-white/10 rounded-xl transition-all focus-within:bg-white/[0.08] focus-within:border-primary">
+      <textarea [ngModel]="eventComment()" (ngModelChange)="eventComment.set($event)"
+        placeholder="Write a comment (optional)..." rows="3"
+        class="w-full bg-transparent border-none !p-3 !min-h-0 text-white text-sm outline-none focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none focus:bg-transparent placeholder:text-[#6b7280] resize-none pb-12"></textarea>
+      <button type="button" title="Submit feedback"
+        class="absolute bottom-2 right-2 !p-0 w-8 h-8 flex items-center justify-center rounded-[8px] disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="eventRating() === 0" (click)="submitEventFeedback()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+  }
+
+  @for (match of matches(); track match.id; let i = $index) {
+  <div
+    class="match-card bg-[rgba(30,41,59,0.4)] border border-white/[0.08] rounded-[20px] p-6 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:border-white/15 hover:shadow-2xl"
+    [style.animation-delay]="i * 0.1 + 's'">
+
+    <!-- Profile section -->
+    <div class="flex items-center gap-4 mb-4">
+      <img [src]="match.img" [alt]="match.name"
+        class="w-[60px] h-[60px] rounded-full object-cover border-2 border-white/10 p-0.5 bg-primary">
+      <div class="flex-1">
+        <h2 class="text-lg font-bold m-0 text-white">{{ match.name }}</h2>
+        <p class="text-sm text-[#9ca3af] mt-0.5">{{ match.title }}</p>
+        <p class="text-xs text-[#9ca3af] mt-0.5 opacity-80">{{ match.company }}</p>
+      </div>
+      <div class="flex flex-col items-end gap-1.5">
+        <span class="bg-primary text-white font-extrabold text-[13px] px-3 py-1.5 rounded-full shadow-md">
+          {{ match.percentage }}%
+        </span>
+        @if (match.mutual) {
+        <span
+          class="text-[11px] font-bold px-2.5 py-1 rounded-xl text-white uppercase tracking-wide bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]">Match!
+          💚</span>
+        } @else if (match.interested) {
+        <span
+          class="text-[11px] font-bold px-2.5 py-1 rounded-xl text-white uppercase tracking-wide bg-amber-500">Interested
+          👍</span>
+        }
+      </div>
+    </div>
+
+    <!-- Detailed Info -->
+    <div class="flex flex-col gap-4 mb-5">
+      @if (match.bio) {
+      <div>
+        <span class="text-[10px] text-[#9ca3af] font-bold uppercase tracking-wider block mb-1">SHORT ABOUT YOU</span>
+        <p class="text-[13px] text-white/90 leading-snug">{{ match.bio }}</p>
+      </div>
+      }
+      @if (match.companyDescription) {
+      <div>
+        <span class="text-[10px] text-[#9ca3af] font-bold uppercase tracking-wider block mb-1">SHORT ABOUT THE
+          COMPANY</span>
+        <p class="text-[13px] text-white/90 leading-snug">{{ match.companyDescription }}</p>
+      </div>
+      }
+
+      <!-- Match feedback -->
+      @if (match.mutual && feedbackRequestSent()) {
+      <div>
+        <span class="text-[11px] text-[#9ca3af] font-medium uppercase tracking-wide block mb-1.5">
+          Give us feedback on the match?
+        </span>
+        <div
+          class="relative bg-white/[0.05] border border-white/10 rounded-xl transition-all focus-within:bg-white/[0.08] focus-within:border-primary">
+          <textarea [ngModel]="matchComments()[match.id] || ''" (ngModelChange)="updateMatchComment(match.id, $event)"
+            placeholder="Write here ..." rows="3"
+            class="w-full bg-transparent border-none !p-3 !min-h-0 text-white text-[13px] outline-none focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none focus:bg-transparent placeholder:text-[#6b7280] resize-none pb-12"
+            (keydown.enter)="$event.preventDefault(); submitFeedback(match, match.feedback || 1)"></textarea>
+          <button type="button" title="Save"
+            class="absolute bottom-2 right-2 !p-0 w-8 h-8 flex items-center justify-center rounded-[8px]"
+            (click)="submitFeedback(match, match.feedback || 1)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Separator -->
+    <div class="h-px mb-5 separator"></div>
+
+    <!-- Action buttons -->
+    <div class="flex flex-col gap-3">
+      @if (!match.interested) {
+      <button type="button" class="btn-primary w-full py-3 h-auto min-h-[44px]" (click)="toggleInterest(match)">
+        👋 I want to meet
+      </button>
+      } @else {
+      <!-- Interest Status Row (Visible if NOT mutual, Clickable to undo) -->
+      @if (!match.mutual) {
+      <div class="flex items-center justify-center gap-3 py-3 cursor-pointer hover:opacity-80 transition-opacity"
+        (click)="removeInterest(match)">
+        <div class="w-6 h-6 bg-[#007aff] rounded flex items-center justify-center shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span class="text-white font-bold text-base">I want to meet</span>
+        <span class="text-2xl">🤝</span>
+      </div>
+      }
+
+      @if (match.mutual && activeChatId() !== match.id) {
+      <button type="button" class="btn-secondary w-full py-3 h-auto min-h-[44px]" (click)="openChat(match)">
+        💬 Open Chat
+      </button>
+      }
+      }
+    </div>
+
+    <!-- Chat area -->
+    @if (activeChatId() === match.id) {
+    <div class="mt-5 bg-black/25 rounded-[18px] p-4 border border-white/[0.05] chat-area">
+      @if (!match.mutual) {
+      <div class="text-center text-sm text-[#9ca3af] p-5 leading-snug">
+        <p>Waiting for {{ match.name.split(' ')[0] }} to also click "I want to meet"...</p>
+      </div>
+      } @else {
+      <!-- Messages -->
+      <div class="max-h-[250px] overflow-y-auto flex flex-col gap-2.5 mb-5 pr-1 chat-messages">
+        @for (msg of chatMessages()[match.id] || []; track $index) {
+        <div class="px-3.5 py-2.5 rounded-2xl text-sm max-w-[85%] leading-snug shadow-sm"
+          [class.self-end]="isMe(msg.senderId)" [class.self-start]="!isMe(msg.senderId)"
+          [style.background]="isMe(msg.senderId) ? 'var(--primary)' : 'rgba(255,255,255,0.08)'"
+          [style.color]="isMe(msg.senderId) ? 'white' : '#e5e7eb'"
+          [style.borderRadius]="isMe(msg.senderId) ? '16px 16px 4px 16px' : '16px 16px 16px 4px'">
+          {{ msg.content }}
+        </div>
+        }
+        @if (!(chatMessages()[match.id]?.length)) {
+        <p class="text-center text-sm text-[#6b7280] p-5 italic">Write something nice to start the conversation!
+        </p>
+        }
+      </div>
+      <!-- Chat input -->
+      <div
+        class="flex items-center bg-white/[0.05] border border-white/10 rounded-[28px] pt-1 pb-1 pl-4 pr-1 gap-2 transition-all chat-input-group">
+        <input [(ngModel)]="newMessage" placeholder="Type a message..."
+          class="flex-1 min-w-0 bg-transparent border-none py-2 text-white text-sm outline-none placeholder:text-[#6b7280]"
+          (keyup.enter)="sendMessage(match)">
+        <button type="button" class="btn-primary shrink-0 px-5 text-sm font-bold"
+          (click)="sendMessage(match)">Send</button>
+      </div>
+      }
+
+    </div>
+    }
+  </div>
+  }
+  }
+</div>
+}
+
+@if (activeTab() === 'schedule') {
+<!-- Schedule View -->
+<div class="flex flex-col gap-5 w-full">
+  @if (scheduleSlots().length === 0) {
+    <div class="bg-[rgba(30,41,59,0.4)] border border-white/[0.08] rounded-[20px] p-8 text-center backdrop-blur-2xl">
+      <h3 class="text-lg font-bold text-white mb-2">No Schedule Slots</h3>
+      <p class="text-sm text-[#9ca3af] mb-6">Your schedule has not been generated yet.</p>
+      @if (isCompanyRole()) {
+      <button class="btn btn-primary px-6 py-2.5" (click)="generateSlots()" [disabled]="isGeneratingSlots()">
+        @if (isGeneratingSlots()) {
+          <span class="material-icons rotating text-sm mr-2">sync</span> Generating...
+        } @else {
+          <span class="material-icons text-sm mr-2">calendar_month</span> Generate My Schedule
+        }
+      </button>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (slot of scheduleSlots(); track slot.id) {
+        <div class="match-card bg-[rgba(30,41,59,0.4)] border border-white/[0.08] rounded-[16px] p-4 backdrop-blur-2xl flex flex-col gap-3 transition-colors" [class.opacity-50]="!slot.isAvailable">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="text-white font-bold text-base m-0">{{ slot.startTime | date:'HH:mm' }} - {{ slot.endTime | date:'HH:mm' }}</h4>
+              
+              @if (slot.assignedStudentId) {
+                <div class="mt-2 text-sm text-emerald-400 font-medium flex items-center gap-1.5">
+                  <span class="material-icons text-sm">person</span>
+                  Booked: {{ slot.assignedStudent?.firstname }} {{ slot.assignedStudent?.lastname }}
+                </div>
+              } @else if (!slot.isAvailable) {
+                <div class="mt-2 text-sm text-red-400 font-medium flex items-center gap-1.5">
+                  <span class="material-icons text-sm">block</span> Unavailable
+                </div>
+              } @else {
+                <div class="mt-2 text-sm text-[#9ca3af] flex items-center gap-1.5">
+                  <span class="material-icons text-sm">event_available</span> Available
+                </div>
+              }
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+              @if (!slot.assignedStudentId) {
+                <button class="btn btn-outline py-1.5 px-3 text-xs h-auto min-h-0" (click)="toggleSlotAvailability(slot.id, !slot.isAvailable)">
+                  {{ slot.isAvailable ? 'Block' : 'Unblock' }}
+                </button>
+              } @else {
+                <button class="btn btn-outline py-1.5 px-3 text-xs h-auto min-h-0 text-red-400 border-red-400/30 hover:bg-red-400/10" (click)="markNoShow(slot.id, !slot.companyMarkedNoShow)">
+                  {{ slot.companyMarkedNoShow ? 'Remove No-Show' : 'Mark No-Show' }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Student Assignment (Only if available and unassigned) -->
+          @if (slot.isAvailable && !slot.assignedStudentId) {
+            <div class="mt-2 pt-3 border-t border-white/10">
+              <label class="text-xs font-semibold text-[#9ca3af] mb-2 block uppercase tracking-wider">Assign Student from Matches</label>
+              <div class="flex gap-2 overflow-x-auto pb-2">
+                <!-- Only show mutual matches to assign -->
+                @for (match of matches(); track match.id) {
+                  @if (match.mutual) {
+                    <button class="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-2 text-left transition-colors flex items-center gap-2" (click)="assignStudent(slot.id, match.id)">
+                      <img [src]="match.img" class="w-6 h-6 rounded-full">
+                      <span class="text-sm text-white font-medium whitespace-nowrap">{{ match.name }}</span>
+                    </button>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+}
+
+<p class="mt-10 text-[13px] text-[#9ca3af] text-center max-w-[320px] leading-relaxed pb-5 mx-auto">
+  When both click "I want to meet", the chat opens automatically.
+</p>
+</div>

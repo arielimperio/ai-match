@@ -1,0 +1,189 @@
+/* Tailwind classes are used for most styling */
+:host {
+  display: block;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Modal Animations */
+.animate-in {
+  animation-duration: 300ms;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.zoom-in-95 {
+  animation-name: zoomIn95;
+}
+
+.slide-in-from-bottom-8 {
+  animation-name: slideInFromBottom8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn95 {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInFromBottom8 {
+  from { transform: translateY(2rem); }
+  to { transform: translateY(0); }
+}
+
+/* List View Refinements */
+.group {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease;
+}
+
+/* Modal UI Components */
+.btn-pill {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-pill:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-pill.active {
+  background: #6366f1; /* indigo-500 */
+  border-color: rgba(99, 102, 241, 0.5);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  transition: all 0.2s;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+}
+
+.tab-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc; /* indigo-300 */
+}
+
+/* Quill White Theme Overrides */
+::ng-deep .quill-dark-wrapper .ql-toolbar {
+  border: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #f8fafc;
+}
+
+::ng-deep .quill-dark-wrapper .ql-container {
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  background: white !important;
+  color: #1e293b !important;
+}
+
+::ng-deep .quill-dark-wrapper .ql-editor.ql-blank::before {
+  color: #94a3b8 !important;
+  font-style: normal;
+}
+
+::ng-deep .quill-dark-wrapper .ql-stroke {
+  stroke: #475569 !important;
+}
+
+::ng-deep .quill-dark-wrapper .ql-fill {
+  fill: #475569 !important;
+}
+
+::ng-deep .quill-dark-wrapper .ql-picker {
+  color: #475569 !important;
+}
+
+::ng-deep .quill-dark-wrapper button:hover .ql-stroke,
+::ng-deep .quill-dark-wrapper .ql-picker-label:hover .ql-stroke {
+  stroke: #2563eb !important;
+}
+
+::ng-deep .quill-dark-wrapper button:hover .ql-fill,
+::ng-deep .quill-dark-wrapper .ql-picker-label:hover .ql-fill {
+  fill: #2563eb !important;
+}
+
+::ng-deep .quill-dark-wrapper .ql-editor {
+  min-height: 400px;
+}
+
+/* Logo scaling constraints */
+div[innerHTML] ::ng-deep svg,
+div[innerHTML] ::ng-deep img {
+  height: 32px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Stat card entrance animation */
+@keyframes statFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card-enter {
+  animation: statFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Row chevron slide on hover */
+.group:hover .row-chevron {
+  transform: translateX(3px);
+  opacity: 0.8;
+}
+
+.row-chevron {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.3;
+}

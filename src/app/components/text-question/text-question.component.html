@@ -1,0 +1,16 @@
+<div class="glass-container">
+  <!-- Progress bar -->
+  <div class="mb-10 h-1 bg-white/10 rounded-sm">
+    <div class="h-full bg-primary rounded-sm transition-all" style="width: 80%"></div>
+  </div>
+
+  <h1>{{ content().title }}</h1>
+  <p class="description">{{ content().description }}</p>
+
+  <textarea rows="4" [placeholder]="content().placeholder" [ngModel]="service.answers().bio"
+    (ngModelChange)="updateBio($event)" class="w-full"></textarea>
+
+  <button class="btn-primary" (click)="next()">
+    Next Step <span>→</span>
+  </button>
+</div>

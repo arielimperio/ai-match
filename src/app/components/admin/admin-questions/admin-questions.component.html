@@ -1,0 +1,319 @@
+<div class="font-[Inter,sans-serif]">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-5">
+    <h3 class="text-xl sm:text-2xl font-extrabold m-0"
+      style="background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+      Manage Questions
+    </h3>
+    <button class="btn-primary w-full sm:w-auto" (click)="addQuestion()" *ngIf="!selectedQuestion()">
+      ➕ Add new question
+    </button>
+  </div>
+
+  <!-- Loading skeleton -->
+  @if (isLoading() && questions().length === 0) {
+  <div class="animate-pulse flex flex-col gap-3">
+    @for (i of [1,2,3,4,5]; track i) {
+    <div class="flex items-center gap-3 px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl">
+      <div class="w-8 h-4 bg-white/10 rounded-full shrink-0"></div>
+      <div class="h-4 bg-white/10 rounded flex-1"></div>
+      <div class="w-16 h-4 bg-white/[0.07] rounded shrink-0"></div>
+    </div>
+    }
+  </div>
+  }
+
+
+  <!-- Questions list — 3 column layout when role selection enabled -->
+  <div *ngIf="!selectedQuestion()">
+
+    <!-- Simple flat list (role selection OFF) -->
+    <div *ngIf="!isRoleSelectionEnabled()" class="flex flex-col gap-2 sm:max-w-[800px] mx-auto questions-list"
+      cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let q of questions(); let i = index; trackBy: trackById"
+        class="flex items-center gap-3 px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl cursor-pointer transition-all hover:bg-white/[0.07] hover:border-white/20 group"
+        (click)="selectQuestion(q)" cdkDrag cdkDragBoundary=".questions-list">
+        <div class="text-white/25 cursor-grab hover:text-primary transition-colors shrink-0" cdkDragHandle>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+        </div>
+        <span class="text-[10px] font-extrabold bg-white/10 text-text-muted px-2 py-0.5 rounded-full uppercase w-8 text-center shrink-0">{{q.id}}</span>
+        <span class="font-semibold text-white text-sm flex-1 truncate">{{q.title}}</span>
+        <span class="text-[10px] bg-[rgba(79,70,229,0.2)] text-primary px-1.5 py-0.5 rounded font-bold uppercase shrink-0">{{q.type || 'Choice'}}</span>
+        <span *ngIf="q.isHidden" class="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded font-bold uppercase shrink-0">HIDDEN</span>
+        <button class="shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-red-400 transition-all p-1 rounded-full"
+          (click)="deleteQuestion(q, $event)" title="Delete">
+          <span class="material-icons text-[18px]">delete_outline</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3-column layout (role selection ON) -->
+    <div *ngIf="isRoleSelectionEnabled()" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+      <!-- ── All Participants ── -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 pb-2 border-b border-white/10 mb-1">
+          <span class="text-[11px] font-extrabold uppercase tracking-widest text-text-muted">All Participants</span>
+          <span class="ml-auto text-[11px] text-text-muted bg-white/10 rounded-full px-2 py-0.5">
+            {{(questions() | filterByRole:'All').length}}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2 questions-list-all" cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let q of questions() | filterByRole:'All'; trackBy: trackById"
+          class="flex items-center gap-2 px-3 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg cursor-pointer transition-all hover:bg-white/[0.07] hover:border-white/20 group"
+          (click)="selectQuestion(q)" cdkDrag cdkDragBoundary=".questions-list-all">
+          <div class="text-white/25 cursor-grab hover:text-primary transition-colors shrink-0" cdkDragHandle><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
+          <span class="text-[9px] font-extrabold bg-white/10 text-text-muted px-1.5 py-0.5 rounded-full uppercase shrink-0">{{q.id}}</span>
+          <span class="font-medium text-white text-sm flex-1 truncate leading-tight">{{q.title}}</span>
+          <button class="shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-red-400 transition-all"
+            (click)="deleteQuestion(q, $event)" title="Delete">
+            <span class="material-icons text-[16px]">delete_outline</span>
+          </button>
+        </div>
+        </div>
+        <div *ngIf="(questions() | filterByRole:'All').length === 0"
+          class="text-center py-6 text-text-muted text-xs border border-dashed border-white/10 rounded-lg">
+          No questions
+        </div>
+      </div>
+
+      <!-- ── Student Only ── -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 pb-2 border-b mb-1" style="border-color: color-mix(in srgb, var(--primary) 40%, transparent)">
+          <span class="text-[11px] font-extrabold uppercase tracking-widest" style="color: var(--primary)">{{ roleStudentName() }}</span>
+          <span class="ml-auto text-[11px] text-text-muted bg-white/10 rounded-full px-2 py-0.5">
+            {{(questions() | filterByRole:'Student').length}}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2 questions-list-student" cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let q of questions() | filterByRole:'Student'; trackBy: trackById"
+          class="flex items-center gap-2 px-3 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg cursor-pointer transition-all hover:bg-white/[0.07] hover:border-white/20 group"
+          style="border-left: 2px solid color-mix(in srgb, var(--primary) 50%, transparent)"
+          (click)="selectQuestion(q)" cdkDrag cdkDragBoundary=".questions-list-student">
+          <div class="text-white/25 cursor-grab hover:text-primary transition-colors shrink-0" cdkDragHandle><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
+          <span class="text-[9px] font-extrabold bg-white/10 text-text-muted px-1.5 py-0.5 rounded-full uppercase shrink-0">{{q.id}}</span>
+          <span class="font-medium text-white text-sm flex-1 truncate leading-tight">{{q.title}}</span>
+          <button class="shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-red-400 transition-all"
+            (click)="deleteQuestion(q, $event)" title="Delete">
+            <span class="material-icons text-[16px]">delete_outline</span>
+          </button>
+        </div>
+        </div>
+        <div *ngIf="(questions() | filterByRole:'Student').length === 0"
+          class="text-center py-6 text-text-muted text-xs border border-dashed border-white/10 rounded-lg">
+          No questions
+        </div>
+      </div>
+
+      <!-- ── Company Only ── -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 pb-2 border-b mb-1" style="border-color: color-mix(in srgb, var(--accent) 40%, transparent)">
+          <span class="text-[11px] font-extrabold uppercase tracking-widest" style="color: var(--accent)">{{ roleCompanyName() }}</span>
+          <span class="ml-auto text-[11px] text-text-muted bg-white/10 rounded-full px-2 py-0.5">
+            {{(questions() | filterByRole:'Company').length}}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2 questions-list-company" cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let q of questions() | filterByRole:'Company'; trackBy: trackById"
+          class="flex items-center gap-2 px-3 py-2.5 bg-white/[0.03] border border-white/10 rounded-lg cursor-pointer transition-all hover:bg-white/[0.07] hover:border-white/20 group"
+          style="border-left: 2px solid color-mix(in srgb, var(--accent) 50%, transparent)"
+          (click)="selectQuestion(q)" cdkDrag cdkDragBoundary=".questions-list-company">
+          <div class="text-white/25 cursor-grab hover:text-primary transition-colors shrink-0" cdkDragHandle><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
+          <span class="text-[9px] font-extrabold bg-white/10 text-text-muted px-1.5 py-0.5 rounded-full uppercase shrink-0">{{q.id}}</span>
+          <span class="font-medium text-white text-sm flex-1 truncate leading-tight">{{q.title}}</span>
+          <button class="shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:text-red-400 transition-all"
+            (click)="deleteQuestion(q, $event)" title="Delete">
+            <span class="material-icons text-[16px]">delete_outline</span>
+          </button>
+        </div>
+        </div>
+        <div *ngIf="(questions() | filterByRole:'Company').length === 0"
+          class="text-center py-6 text-text-muted text-xs border border-dashed border-white/10 rounded-lg">
+          No questions
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Editor — compact padding on mobile -->
+  <div
+    class="border border-card-border p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-card-bg backdrop-blur-xl shadow-2xl question-editor pb-32"
+    *ngIf="selectedQuestion()">
+    <!-- Editor header -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b border-card-border">
+      <h4 class="m-0 text-base font-semibold">{{ isNewQuestion() ? 'New Question' : 'Edit ' + selectedQuestion().id }}
+      </h4>
+      <button
+        class="bg-none border-none text-2xl cursor-pointer text-text-muted p-1 rounded-full transition-colors hover:bg-white/10 hover:text-red-400"
+        (click)="cancelEdit()">✕</button>
+    </div>
+
+    <!-- ID + Type: 1-col on mobile, 2-col on sm+ -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="mb-5">
+        <label class="block mb-2 font-semibold text-sm text-text-muted">ID (t.ex. q6)</label>
+        <input type="text" [(ngModel)]="selectedQuestion().id" [disabled]="!isNewQuestion()" placeholder="qX">
+      </div>
+      <div class="mb-5">
+        <label class="block mb-2 font-semibold text-sm text-text-muted">Type</label>
+        <select [(ngModel)]="selectedQuestion().type" class="w-full">
+          <option value="Choice">Single Choice (Radio)</option>
+          <option value="MultipleChoice">Multiple Choice (Checkboxes)</option>
+          <option value="Text">Free Text (Textarea)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-5">
+      <label class="block mb-2 font-semibold text-sm text-text-muted">Title</label>
+      <input type="text" [(ngModel)]="selectedQuestion().title" placeholder="Title">
+    </div>
+
+    <!-- Target Role Setting -->
+    @if (isRoleSelectionEnabled()) {
+    <div class="mb-5 p-4 bg-white/5 border border-white/10 rounded-xl">
+      <label class="block mb-2 font-bold text-sm text-accent uppercase tracking-wider">Target Role (Who sees this question?)</label>
+      <select [ngModel]="selectedQuestion().targetRole || 'All'" 
+              (ngModelChange)="updateTargetRole($event)"
+              class="w-full">
+        <option value="All">All Participants</option>
+        <option value="Student">{{roleStudentName()}}</option>
+        <option value="Company">{{roleCompanyName()}}</option>
+      </select>
+      <p class="text-[11px] text-text-muted mt-2">Filter this question so only specific roles can see and answer it.</p>
+    </div>
+    }
+
+    <div class="mb-5">
+      <label class="block mb-2 font-semibold text-sm text-text-muted">Description</label>
+      <textarea [(ngModel)]="selectedQuestion().description" rows="3"></textarea>
+    </div>
+
+    <div class="mb-5" *ngIf="selectedQuestion().type === 'Text' || selectedQuestion().type === 'MultipleChoice'">
+      <label class="block mb-2 font-semibold text-sm text-text-muted">
+        {{ selectedQuestion().type === 'Text' ? 'Max length (chars)' : 'Max total choices' }}
+      </label>
+      <input type="number" [(ngModel)]="selectedQuestion().maxLength"
+        [placeholder]="selectedQuestion().type === 'Text' ? 'e.g. 50' : 'e.g. 3'">
+    </div>
+
+    <div class="mb-5" *ngIf="selectedQuestion().type === 'Text'">
+      <label class="block mb-2 font-semibold text-sm text-text-muted">Placeholder (for text questions)</label>
+      <input type="text" [(ngModel)]="selectedQuestion().placeholder" placeholder="E.g. Write here...">
+    </div>
+
+    <!-- Options editor — redesigned -->
+    <div class="mt-8 pt-6 border-t border-card-border" *ngIf="selectedQuestion().options">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="m-0 text-base font-semibold text-text-main">Options</h5>
+        <button class="btn btn-sm btn-primary flex items-center gap-1.5" (click)="addOption()">
+          <span class="material-icons text-sm">add</span> Add option
+        </button>
+      </div>
+
+      <div class="options-list-editor flex flex-col gap-3" cdkDropList (cdkDropListDropped)="dropOption($event)">
+        <div *ngFor="let opt of selectedQuestion().options; let i = index; trackBy: trackById"
+          class="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden option-item" cdkDrag
+          cdkDragBoundary=".options-list-editor">
+
+          <!-- Card toolbar row -->
+          <div class="flex items-center gap-2 px-3 py-2 bg-white/[0.03] border-b border-white/[0.05]">
+            <!-- Drag handle -->
+            <div
+              class="text-white/25 cursor-grab flex items-center hover:text-primary transition-colors opt-drag-handle"
+              cdkDragHandle title="Drag to reorder">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="5" r="1" />
+                <circle cx="15" cy="5" r="1" />
+                <circle cx="9" cy="12" r="1" />
+                <circle cx="15" cy="12" r="1" />
+                <circle cx="9" cy="19" r="1" />
+                <circle cx="15" cy="19" r="1" />
+              </svg>
+            </div>
+            <!-- Number badge -->
+            <span
+              class="text-[11px] font-bold text-text-muted bg-white/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">{{i+1}}</span>
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+            <!-- Actions Group -->
+            <div class="flex items-center gap-3">
+              <label
+                class="m-0 flex items-center gap-1.5 cursor-pointer text-xs text-text-muted hover:text-white transition-colors select-none">
+                <input type="checkbox" [(ngModel)]="opt.isHidden" class="w-3.5 h-3.5 accent-primary cursor-pointer">
+                <span>Hide</span>
+              </label>
+
+              <span *ngIf="opt.isHidden"
+                class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded font-bold uppercase leading-none">Hidden</span>
+
+              <button
+                class="flex items-center gap-1 text-xs text-red-400/60 hover:text-red-400 hover:bg-red-500/10 px-2 py-1 rounded-md border border-transparent hover:border-red-500/20 transition-all"
+                (click)="removeOption(i)" title="Remove option">
+                <span class="material-icons text-[14px]">delete_outline</span>
+                <span class="hidden sm:inline">Remove</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card body: fields in a clean grid -->
+          <div class="p-4 flex flex-col gap-3">
+            <!-- Row 1: Emoji + Title -->
+            <div class="flex gap-3 items-start">
+              <div class="flex flex-col gap-1 shrink-0">
+                <label class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Icon</label>
+                <input type="text" [(ngModel)]="opt.icon"
+                  class="w-14 h-10 text-center text-2xl rounded-lg border border-white/10 bg-white/[0.04] focus:border-primary transition-colors"
+                  placeholder="🏷️">
+              </div>
+              <div class="flex flex-col gap-1 flex-1 min-w-0">
+                <label class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Title <span
+                    class="text-red-400">*</span></label>
+                <input type="text" [(ngModel)]="opt.title" class="w-full font-semibold text-white"
+                  placeholder="E.g. Sales & BD">
+              </div>
+            </div>
+
+            <!-- Row 2: Description -->
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Description</label>
+              <input type="text" [(ngModel)]="opt.description" class="w-full text-sm"
+                placeholder="Short description of the option...">
+            </div>
+
+            <!-- Row 3: Technical value -->
+            <div class="flex items-center gap-3 pt-1 border-t border-white/[0.05]">
+              <label class="text-[10px] uppercase tracking-wider text-text-muted font-semibold shrink-0">Technical value</label>
+              <input type="text" [(ngModel)]="opt.value" class="flex-1 font-mono text-sm text-accent"
+                placeholder="e.g. sales">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div
+        class="text-center py-10 text-text-muted bg-white/[0.02] rounded-xl border border-dashed border-card-border mt-2"
+        *ngIf="selectedQuestion().options.length === 0">
+        <span class="material-icons text-4xl opacity-30 mb-2 block">list_alt</span>
+        <p class="text-sm mb-3">No options yet.</p>
+        <button class="btn btn-sm btn-primary" (click)="addOption()">
+          <span class="material-icons text-sm mr-1">add</span> Add first
+        </button>
+      </div>
+    </div>
+
+    <!-- Editor actions — sticky at the bottom of the editor card -->
+    <div class="sticky bottom-0 left-0 right-0 p-4 sm:p-6 bg-[#001117]/95 backdrop-blur-xl border-t border-white/10 z-50 -mx-5 sm:-mx-8 -mb-5 sm:-mb-8 rounded-b-2xl sm:rounded-b-3xl actions-floating">
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end items-center gap-3 w-full">
+        <!-- Action Cluster on the Right -->
+        <button class="btn btn-secondary w-full sm:w-auto sm:px-8" (click)="cancelEdit()">Cancel</button>
+        <button class="btn btn-outline !border-white/20 !text-white !bg-white/5 hover:!bg-white/10 w-full sm:w-auto" (click)="previewSurvey()">
+          👁️ Preview Survey
+        </button>
+        <button class="btn btn-primary w-full sm:w-auto sm:px-12" (click)="saveQuestion()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

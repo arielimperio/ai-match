@@ -1,0 +1,132 @@
+<div class="glass-container relative">
+  <!-- Progress bar -->
+  <div class="mb-8 h-1 bg-white/10 rounded-sm">
+    <div class="h-full bg-primary rounded-sm transition-all" style="width: 100%"></div>
+  </div>
+
+  <h1>{{ service.profileTitle() }}</h1>
+  <p class="description">{{ service.profileDescription() }}</p>
+  <p class="text-[11px] text-text-muted mb-6">
+    <span class="text-red-400">*</span> Required fields.
+  </p>
+
+  <div class="text-center">
+    <div class="input-group">
+      <label>First name <span class="text-red-400">*</span></label>
+      <input type="text" [ngModel]="service.answers().firstName" (ngModelChange)="update('firstName', $event)"
+        placeholder="Your first name">
+    </div>
+    <div class="input-group">
+      <label>Last name <span class="text-red-400">*</span></label>
+      <input type="text" [ngModel]="service.answers().lastName" (ngModelChange)="update('lastName', $event)"
+        placeholder="Your last name">
+    </div>
+    <div class="input-group">
+      <label>Email <span class="text-red-400">*</span></label>
+      <input type="email" [ngModel]="service.answers().email" (ngModelChange)="update('email', $event)"
+        placeholder="your.email@example.com">
+    </div>
+    @if (service.profileShowRole()) {
+    <div class="input-group">
+      <label>Role / Title</label>
+      <input type="text" [ngModel]="service.answers().title" (ngModelChange)="update('title', $event)"
+        placeholder="Your professional role">
+    </div>
+    }
+    @if (service.profileShowCompany()) {
+    <div class="input-group">
+      <label>Company / Organization</label>
+      <input type="text" [ngModel]="service.answers().company" (ngModelChange)="update('company', $event)"
+        placeholder="Name of your business">
+    </div>
+    }
+
+    <!-- Photo upload -->
+    @if (service.profileShowPhoto()) {
+    <div class="my-6 p-5 bg-white/[0.02] rounded-2xl border border-card-border">
+      <div id="photo-preview"
+        class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-dashed border-card-border flex items-center justify-center overflow-hidden bg-white/[0.03]">
+        @if (service.answers().photo) {
+        <img [src]="service.answers().photo" class="w-full h-full object-cover">
+        } @else {
+        <span class="text-2xl">📷</span>
+        }
+      </div>
+      <input type="file" #photoInput accept="image/*" class="hidden" (change)="handlePhoto(photoInput.files)">
+      <button class="btn btn-sm" (click)="photoInput.click()">
+        {{ service.answers().photo ? 'Change photo' : 'Upload profile photo' }}
+      </button>
+    </div>
+    }
+
+    <!-- Terms -->
+    <div class="mb-6 text-left px-1">
+      <label class="flex items-start gap-3 cursor-pointer select-none">
+        <input type="checkbox" [ngModel]="service.answers().hasAcceptedTerms"
+          (ngModelChange)="update('hasAcceptedTerms', $event)" class="w-5 h-5 mt-0.5 cursor-pointer accent-primary">
+        <span class="text-[13px] leading-relaxed text-slate-300">
+          {{ service.profileConsentText() }}
+        </span>
+      </label>
+      <div class="mt-6 p-4 bg-white/[0.03] rounded-xl border border-card-border">
+        <h3 class="text-sm font-bold mb-2 text-white flex items-center gap-2">{{ service.profilePrivacyTitle() }}</h3>
+        <p class="text-[13px] leading-relaxed text-text-muted m-0">
+          {{ service.profilePrivacyText() }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="button-group">
+    <button class="btn btn-secondary flex-1" (click)="back()">
+      <span>←</span> Back
+    </button>
+    <button class="btn-primary flex-[1.6]" (click)="finish()" [disabled]="isSubmitting">
+      @if (isSubmitting) {
+      <div class="loader"></div>
+      } @else {
+      Finish <span>→</span>
+      }
+    </button>
+  </div>
+
+  <!-- Matching result prompt modal -->
+  @if (showChoiceModal) {
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+    <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl backdrop-blur-lg flex flex-col gap-5 text-center animate-fade-in">
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl mb-2 text-primary animate-pulse">
+          🎯
+        </div>
+        <h2 class="text-xl font-bold text-white mb-0">Matchmaking Result</h2>
+        <p class="text-sm text-text-muted leading-relaxed">
+          How would you like to receive your match result? Get a result immediately, or wait for the matching to start.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button class="btn btn-primary w-full py-3" (click)="submitAndNavigate('now')" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <div class="loader mx-auto"></div>
+          } @else {
+            See my matches now 🚀
+          }
+        </button>
+
+        <button class="btn btn-secondary w-full py-3" (click)="submitAndNavigate('later')" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <div class="loader mx-auto"></div>
+          } @else {
+            Get it later ⏳
+          }
+        </button>
+
+        <button class="text-xs text-text-muted hover:text-white transition-colors underline pt-1 cursor-pointer" (click)="cancelModal()" [disabled]="isSubmitting">
+          Go back to survey
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

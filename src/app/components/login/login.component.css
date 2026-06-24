@@ -1,0 +1,74 @@
+/* Only styles that need CSS variables or pseudo-elements */
+
+/* Logo visibility enhancements removed here, handled globally in styles.css */
+
+@keyframes logo-pulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.2)); }
+  50% { transform: scale(1.02); filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.2)); }
+}
+
+.logo-glow-active {
+  animation: logo-pulse 4s ease-in-out infinite;
+}
+
+/* Gradient text heading */
+.brand-header h1 {
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Placeholder color */
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.auth-input {
+  padding-left: 3.5rem !important;
+}
+
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus,
+.auth-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 60px #111b27 inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Ensure material icons transition well on focus group */
+.material-icons {
+  user-select: none;
+}
+
+/* Shake animation on error */
+@keyframes shake {
+
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.error-message {
+  animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}

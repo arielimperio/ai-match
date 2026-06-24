@@ -1,0 +1,27 @@
+<div class="editor-container" [class.disabled]="isDisabled">
+  <div class="toolbar">
+    <div class="btn-group">
+      <button type="button" (click)="format('formatBlock', 'p')" title="Paragraph">P</button>
+      <button type="button" (click)="format('formatBlock', 'h2')" title="Header 2">H2</button>
+      <button type="button" (click)="format('formatBlock', 'h3')" title="Header 3">H3</button>
+    </div>
+    <div class="separator"></div>
+    <div class="btn-group">
+      <button type="button" (click)="format('bold')" title="Bold"><b>B</b></button>
+      <button type="button" (click)="format('italic')" title="Italic"><i>I</i></button>
+      <button type="button" (click)="format('underline')" title="Underline"><u>U</u></button>
+    </div>
+    <div class="separator"></div>
+    <div class="btn-group">
+      <button type="button" (click)="format('insertUnorderedList')" title="Bullet List">• list</button>
+      <button type="button" (click)="format('insertOrderedList')" title="Numbered List">1. list</button>
+    </div>
+    <div class="separator"></div>
+    <div class="btn-group">
+      <button type="button" (click)="insertLink()" title="Add Link">🔗</button>
+      <button type="button" (click)="format('removeFormat')" title="Clear Formatting">🧹</button>
+    </div>
+  </div>
+  <div class="editor-content" contenteditable="true" #editor (input)="onInput()">
+  </div>
+</div>

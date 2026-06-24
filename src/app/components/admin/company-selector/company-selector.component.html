@@ -1,0 +1,1415 @@
+<!-- Replicate login ambient background effects -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+  <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]"></div>
+</div>
+
+<div class="min-h-screen text-white selection:bg-[#3B82F6]/30 font-sans flex flex-col relative z-0">
+  <!-- Header -->
+  <header class="h-20 w-full px-8 flex items-center justify-between shrink-0">
+    <!-- Left: Logo & Context -->
+    <div class="flex items-center gap-3">
+      <img src="assets/mint-logo.png" alt="ITM Logo" class="h-12 w-auto opacity-90 drop-shadow-md object-contain">
+    </div>
+
+    <!-- Right: Header Actions -->
+    <div class="flex items-center gap-4">
+      <button (click)="showSecurityModal.set(true)"
+        class="px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.05] flex items-center gap-2 transition-all text-slate-300">
+        <span class="material-icons text-[16px] text-slate-400">lock_outline</span>
+        Security
+      </button>
+      <button (click)="logout()"
+        class="px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.05] flex items-center gap-2 transition-all text-slate-300">
+        Log out
+        <span class="material-icons text-[16px]">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="w-full px-6 sm:px-8 py-6 md:py-8 flex flex-col md:flex-row items-start gap-8 flex-grow">
+    
+    <!-- Left Sidebar Menu -->
+    <aside class="w-full md:w-64 shrink-0 sticky top-8 flex flex-col gap-1.5 md:border-r border-white/5 md:pr-6 h-fit z-10">
+      
+      <!-- Title (Desktop) -->
+      <div class="mb-8 px-2 hidden md:block">
+        <h1 class="text-xl font-black mb-1 tracking-tight drop-shadow-md text-white/95 text-glow leading-tight">
+          System Dashboard
+        </h1>
+        <p class="text-slate-400/80 text-[10px] font-medium leading-relaxed">
+          Overview of all active matchmaking events
+        </p>
+      </div>
+
+      <!-- Title (Mobile) -->
+      <div class="mb-6 block md:hidden text-center">
+        <h1 class="text-xl font-black mb-1 tracking-tight drop-shadow-md text-white/95 text-glow">
+          System Dashboard
+        </h1>
+        <p class="text-slate-400/80 text-[10px] font-medium">
+          Overview of all active matchmaking events
+        </p>
+      </div>
+
+      <!-- Vertical Tabs -->
+      <div class="flex md:flex-col items-center md:items-stretch gap-2 md:gap-1.5 overflow-x-auto w-full no-scrollbar pb-4 md:pb-0 border-b border-white/5 md:border-none mb-6 md:mb-0">
+        <button (click)="switchTab('overview')"
+          class="px-4 py-3 text-[11px] font-black tracking-[0.1em] uppercase transition-all flex items-center gap-3 rounded-xl whitespace-nowrap text-left w-full"
+          [ngClass]="{
+            'bg-[#3B82F6]/10 text-[#3B82F6] md:border-l-[3px] border-b-2 md:border-b-0 border-[#3B82F6]': activeTab() === 'overview',
+            'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300': activeTab() !== 'overview'
+          }">
+          <span class="material-icons text-[18px]">event</span>
+          Overview
+        </button>
+
+        @if (currentUser?.role === 'SuperAdmin') {
+          <button (click)="switchTab('ai')"
+            class="px-4 py-3 text-[11px] font-black tracking-[0.1em] uppercase transition-all flex items-center gap-3 rounded-xl whitespace-nowrap text-left w-full"
+            [ngClass]="{
+              'bg-[#3B82F6]/10 text-[#3B82F6] md:border-l-[3px] border-b-2 md:border-b-0 border-[#3B82F6]': activeTab() === 'ai',
+              'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300': activeTab() !== 'ai'
+            }">
+            <span class="material-icons text-[18px]">psychology</span>
+            AI Config
+          </button>
+
+          <button (click)="switchTab('email')"
+            class="px-4 py-3 text-[11px] font-black tracking-[0.1em] uppercase transition-all flex items-center gap-3 rounded-xl whitespace-nowrap text-left w-full"
+            [ngClass]="{
+              'bg-[#3B82F6]/10 text-[#3B82F6] md:border-l-[3px] border-b-2 md:border-b-0 border-[#3B82F6]': activeTab() === 'email',
+              'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300': activeTab() !== 'email'
+            }">
+            <span class="material-icons text-[18px]">mail_outline</span>
+            Email Config
+          </button>
+
+          <button (click)="switchTab('emailTemplates')"
+            class="px-4 py-3 text-[11px] font-black tracking-[0.1em] uppercase transition-all flex items-center gap-3 rounded-xl whitespace-nowrap text-left w-full"
+            [ngClass]="{
+              'bg-[#3B82F6]/10 text-[#3B82F6] md:border-l-[3px] border-b-2 md:border-b-0 border-[#3B82F6]': activeTab() === 'emailTemplates',
+              'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300': activeTab() !== 'emailTemplates'
+            }">
+            <span class="material-icons text-[18px]">description</span>
+            Email Templates
+          </button>
+
+          <button (click)="switchTab('branding')"
+            class="px-4 py-3 text-[11px] font-black tracking-[0.1em] uppercase transition-all flex items-center gap-3 rounded-xl whitespace-nowrap text-left w-full"
+            [ngClass]="{
+              'bg-[#3B82F6]/10 text-[#3B82F6] md:border-l-[3px] border-b-2 md:border-b-0 border-[#3B82F6]': activeTab() === 'branding',
+              'text-slate-500 hover:bg-white/[0.03] hover:text-slate-300': activeTab() !== 'branding'
+            }">
+            <span class="material-icons text-[18px]">palette</span>
+            System Branding
+          </button>
+        }
+      </div>
+    </aside>
+
+    <!-- Main Content Area (Active Tab) -->
+    <div class="w-full flex-grow flex flex-col min-w-0">
+      @if (activeTab() === 'overview') {
+
+      <!-- ── Stats Summary Bar ── -->
+      @if (!loading && filteredCompanies().length > 0) {
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full mb-8">
+        <!-- Total Events -->
+        <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-4 flex flex-col gap-1 group hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/5 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Events</span>
+          <span class="text-3xl font-black text-white leading-none">{{ companies().length }}</span>
+          <span class="text-[10px] text-slate-600 font-medium">Managed accounts</span>
+        </div>
+        <!-- Total Participants -->
+        <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-4 flex flex-col gap-1 group hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Participants</span>
+          <span class="text-3xl font-black text-white leading-none">{{ totalParticipantsCount() }}</span>
+          <span class="text-[10px] text-slate-600 font-medium">Total registered</span>
+        </div>
+        <!-- Active -->
+        <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-4 flex flex-col gap-1 group hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Active</span>
+          <span class="text-3xl font-black text-emerald-400 leading-none">{{ activeCompaniesCount() }}</span>
+          <span class="text-[10px] text-slate-600 font-medium">Verified accounts</span>
+        </div>
+        <!-- Pending -->
+        <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-4 flex flex-col gap-1 group hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Pending</span>
+          <span class="text-3xl font-black text-amber-400 leading-none">{{ pendingCompaniesCount() }}</span>
+          <span class="text-[10px] text-slate-600 font-medium">Awaiting verification</span>
+        </div>
+      </div>
+      }
+
+      <!-- Search Bar + New Event CTA -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6 w-full">
+        <div class="relative flex-1 min-w-0">
+          <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-[20px] pointer-events-none">search</span>
+          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+            style="padding-left: 3rem !important;"
+            class="w-full bg-[#111827] border border-white/5 rounded-xl py-3 pr-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-[#3B82F6]/50 focus:bg-[#1f2937]/50 transition-all shadow-inner"
+            placeholder="Search companies...">
+        </div>
+        @if (currentUser?.role === 'SuperAdmin') {
+        <button (click)="openCreateEventModal()"
+          class="shrink-0 flex items-center gap-2 px-5 py-3 bg-[#3B82F6] hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap">
+          <span class="material-icons text-[16px]">add</span>
+          New Event
+        </button>
+        }
+      </div>
+
+      <!-- Table Container -->
+      <div class="bg-[#111827]/40 rounded-3xl border border-white/5 overflow-hidden w-full backdrop-blur-sm flex flex-col shadow-2xl">
+
+        <!-- Table Header -->
+        <div class="grid grid-cols-12 gap-4 px-8 py-4 bg-[#0d1527]/60 border-b border-white/[0.04] items-center rounded-t-3xl">
+          <div class="text-[10px] font-black text-slate-600 tracking-[0.2em] uppercase"
+               [class]="currentUser?.role === 'SuperAdmin' ? 'col-span-12 md:col-span-4' : 'col-span-12 md:col-span-6'">
+            {{ currentUser?.role === 'SuperAdmin' ? 'Account / Company' : 'Event Name' }}
+          </div>
+          @if (currentUser?.role === 'SuperAdmin') {
+            <div class="col-span-12 md:col-span-3 hidden md:block text-[10px] font-black text-slate-600 tracking-[0.2em] uppercase">Administrator</div>
+          }
+          <div class="col-span-12 md:col-span-1 hidden md:block text-center text-[10px] font-black text-slate-600 tracking-[0.2em] uppercase">Status</div>
+          <div class="col-span-12 md:col-span-2 hidden md:block text-center text-[10px] font-black text-slate-600 tracking-[0.2em] uppercase whitespace-nowrap">Participants</div>
+          <div class="col-span-12 md:col-span-2 hidden md:block"></div>
+        </div>
+
+        <!-- Table Body -->
+        <div class="flex flex-col">
+          @if (loading) {
+          <div class="flex flex-col items-center justify-center py-24 gap-4">
+            <div class="relative w-12 h-12">
+              <div class="absolute inset-0 rounded-full border-2 border-[#3B82F6]/20"></div>
+              <div class="absolute inset-0 rounded-full border-2 border-t-[#3B82F6] animate-spin"></div>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600 animate-pulse">Loading accounts...</p>
+          </div>
+          } @else if (filteredCompanies().length === 0) {
+          <div class="flex flex-col items-center justify-center py-24 px-8 text-center">
+            <div class="w-20 h-20 rounded-3xl bg-[#3B82F6]/5 border border-[#3B82F6]/10 flex items-center justify-center mb-6">
+              <span class="material-icons text-4xl text-[#3B82F6]/40">rocket_launch</span>
+            </div>
+            <p class="text-lg font-bold text-white mb-2">No events yet</p>
+            <p class="text-xs text-slate-500 mb-8 max-w-xs leading-relaxed">
+              {{ searchQuery() ? 'No events match your search. Try a different keyword.' : 'Create your first matchmaking event to get started with AI-powered networking.' }}
+            </p>
+            @if (!searchQuery()) {
+            <button (click)="openCreateEventModal()"
+              class="flex items-center gap-2 px-6 py-3 bg-[#3B82F6] hover:bg-blue-500 font-bold text-white text-sm rounded-xl transition-all shadow-xl shadow-blue-500/20">
+              <span class="material-icons text-sm">add</span>
+              Create Your First Event
+            </button>
+            }
+          </div>
+          } @else {
+          <div class="flex flex-col">
+            @for (account of filteredCompanies(); track account.id) {
+            <div (click)="selectCompany(account.companyId || account.id)"
+              class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-white/[0.025] items-center transition-all group border-b border-white/[0.04] last:border-0 cursor-pointer">
+
+              <!-- Company / Name Column -->
+              <div [class]="currentUser?.role === 'SuperAdmin' ? 'col-span-12 md:col-span-4 flex items-center gap-4' : 'col-span-12 md:col-span-6 flex items-center gap-4'">
+                <div class="flex flex-col min-w-0 flex-1">
+                  <span class="text-sm font-bold text-slate-200 group-hover:text-white transition-colors truncate leading-tight">
+                    {{ account.name }}
+                  </span>
+
+                  @if (currentUser?.role === 'SuperAdmin') {
+                    <div class="flex flex-col gap-1 mt-1 min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-[10px] text-slate-500 font-medium truncate" [title]="account.adminEmail">{{ account.adminEmail }}</span>
+
+                        @if (account.hasMultipleEvents) {
+                          <button (click)="openEventSwitcher($event, account)"
+                            class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-all shrink-0"
+                            title="Switch to another event">
+                            <span class="material-icons text-[12px]">swap_horiz</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Switch</span>
+                          </button>
+                        }
+
+                        @if (!account.isVerified) {
+                          <button (click)="resendVerification($event, account)"
+                            class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 transition-all shrink-0"
+                            title="Resend Verification Email">
+                            <span class="material-icons text-[12px]">mail</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Resend</span>
+                          </button>
+                        }
+                      </div>
+
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Admin Info -->
+              @if (currentUser?.role === 'SuperAdmin') {
+                <div class="col-span-12 md:col-span-3 hidden md:flex items-center gap-3">
+                  <div class="flex flex-col min-w-0">
+                    <span class="text-xs text-slate-300 font-semibold truncate">{{ account.adminName }}</span>
+                    <span class="text-[10px] text-slate-600">Account Owner</span>
+                  </div>
+                </div>
+              }
+
+              <!-- Status Badge -->
+              <div [class]="currentUser?.role === 'SuperAdmin' ? 'col-span-12 md:col-span-1 hidden md:flex justify-center' : 'col-span-12 md:col-span-2 hidden md:flex justify-center'">
+                @if (account.isVerified !== false) {
+                  <div class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <div class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)] animate-pulse"></div>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-400">Active</span>
+                  </div>
+                } @else {
+                  <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full">
+                    <div class="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.7)]"></div>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-amber-400">Pending</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Participants Count -->
+              <div class="col-span-12 md:col-span-2 hidden md:flex justify-center">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <span class="material-icons text-[13px] text-slate-500">people</span>
+                  <span class="text-xs font-bold text-slate-300">{{ account.participantCount }}</span>
+                </div>
+              </div>
+
+              <!-- Row Actions -->
+              <div class="col-span-12 md:col-span-2 hidden md:flex justify-end items-center gap-1">
+                  <button (click)="openAccountDetails($event, account)" title="Edit Account Details"
+                    class="p-2 rounded-lg text-slate-600 hover:text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all opacity-0 group-hover:opacity-100">
+                    <span class="material-icons text-[17px]">edit</span>
+                  </button>
+                <button (click)="deleteProject($event, account)" [disabled]="account.participantCount > 0"
+                  class="p-2 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-all disabled:opacity-20 opacity-0 group-hover:opacity-100">
+                  <span class="material-icons text-[17px]">delete_outline</span>
+                </button>
+              </div>
+
+            </div>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Table Footer: row count -->
+        @if (!loading && filteredCompanies().length > 0) {
+        <div class="px-8 py-4 border-t border-white/[0.04] bg-[#0d1527]/30 rounded-b-3xl flex items-center justify-between">
+          <span class="text-[10px] text-slate-600 font-medium">
+            Showing {{ filteredCompanies().length }} of {{ companies().length }} events
+          </span>
+          <span class="text-[10px] text-slate-700 font-medium">Click any row to enter the event dashboard</span>
+        </div>
+        }
+      </div>
+    }
+
+      @if (activeTab() === 'ai') {
+
+    <!-- AI Settings Fragment -->
+    <div
+      class="w-full mt-4 bg-[#111827]/40 rounded-3xl border border-white/5 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+      <h2 class="text-xl font-bold mb-8 text-white">AI Engine Configuration</h2>
+      <div class="space-y-8">
+        <div class="space-y-3">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">AI Provider</label>
+          <div class="flex gap-3">
+            <button (click)="setAiProvider('OpenAI')"
+              [class]="systemSettings().AiProvider === 'OpenAI' ? 'px-6 py-3 rounded-xl border font-bold text-sm transition-all bg-[#3B82F6]/10 border-[#3B82F6] text-[#3B82F6]' : 'px-6 py-3 rounded-xl border font-bold text-sm transition-all bg-white/5 border-white/5 text-slate-400'">
+              OpenAI
+            </button>
+            <button (click)="setAiProvider('Gemini')"
+              [class]="systemSettings().AiProvider === 'Gemini' ? 'px-6 py-3 rounded-xl border font-bold text-sm transition-all bg-[#3B82F6]/10 border-[#3B82F6] text-[#3B82F6]' : 'px-6 py-3 rounded-xl border font-bold text-sm transition-all bg-white/5 border-white/5 text-slate-400'">
+              Google Gemini
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Assigned Model</label>
+          <div class="flex gap-3">
+            @if (systemSettings().AiProvider === 'OpenAI') {
+            <button (click)="updateSystemSetting('AiModel', 'gpt-4o')"
+              [class]="systemSettings().AiModel === 'gpt-4o' ? 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-white/10 border-white/20 text-white' : 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-transparent border-white/5 text-slate-500'">GPT-4o</button>
+            <button (click)="updateSystemSetting('AiModel', 'gpt-4o-mini')"
+              [class]="systemSettings().AiModel === 'gpt-4o-mini' ? 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-white/10 border-white/20 text-white' : 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-transparent border-white/5 text-slate-500'">GPT-4o
+              Mini</button>
+            } @else {
+            <button (click)="updateSystemSetting('AiModel', 'gemini-1.5-flash')"
+              [class]="systemSettings().AiModel === 'gemini-1.5-flash' ? 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-white/10 border-white/20 text-white' : 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-transparent border-white/5 text-slate-500'">Flash
+              1.5</button>
+            <button (click)="updateSystemSetting('AiModel', 'gemini-1.5-pro')"
+              [class]="systemSettings().AiModel === 'gemini-1.5-pro' ? 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-white/10 border-white/20 text-white' : 'px-5 py-2.5 rounded-lg border font-semibold text-xs transition-all bg-transparent border-white/5 text-slate-500'">Pro
+              1.5</button>
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">API Key</label>
+          <input type="text" [ngModel]="systemSettings().AiApiKey"
+            (ngModelChange)="updateSystemSetting('AiApiKey', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxx">
+        </div>
+
+        <button (click)="saveSystemSettings()" [disabled]="isSavingSettings() || isLoadingSettings()"
+          class="w-full px-6 py-4 mt-4 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20">
+          {{ isSavingSettings() ? 'Saving...' : 'Deploy Settings' }}
+        </button>
+      </div>
+    </div>
+
+    } @else if (activeTab() === 'email') {
+
+    <!-- Email Settings Fragment -->
+    <div
+      class="w-full mt-4 bg-[#111827]/40 rounded-3xl border border-white/5 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+      <h2 class="text-xl font-bold mb-8 text-white">Email Server Settings</h2>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">SendGrid Endpoint
+            Key</label>
+          <input type="text" [ngModel]="systemSettings().SendGridApiKey"
+            (ngModelChange)="updateSystemSetting('SendGridApiKey', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="SG.xxxxxxxx">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Sender Address (From
+            Email)</label>
+          <input type="email" [ngModel]="systemSettings().SendGridFromEmail"
+            (ngModelChange)="updateSystemSetting('SendGridFromEmail', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="no-reply@matchmakingpro.com">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Sender Name (From
+            Label)</label>
+          <input type="text" [ngModel]="systemSettings().EmailFromName"
+            (ngModelChange)="updateSystemSetting('EmailFromName', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="Matchmaking Platform">
+        </div>
+
+        <button (click)="saveSystemSettings()" [disabled]="isSavingSettings() || isLoadingSettings()"
+          class="w-full px-6 py-4 mt-4 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20">
+          {{ isSavingSettings() ? 'Applying...' : 'Validate and Save' }}
+        </button>
+      </div>
+    </div>
+
+    } @else if (activeTab() === 'emailTemplates') {
+
+    <!-- Email Templates Fragment -->
+    <div
+      class="w-full mt-4 bg-[#111827]/40 rounded-3xl border border-white/5 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h2 class="text-xl font-bold text-white mb-2">System Email Templates</h2>
+          <p class="text-slate-400 text-xs">Configure the automated emails sent by the platform.</p>
+        </div>
+        <div
+          class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+          {{ activeTemplateType() === 'verification' ? 'Account Setup' : 'Security' }}
+        </div>
+      </div>
+
+      <!-- Template Selector -->
+      <div class="flex gap-2 mb-10 p-1.5 bg-black/20 border border-white/5 rounded-2xl w-fit">
+        <button (click)="activeTemplateType.set('verification')"
+          [class]="activeTemplateType() === 'verification' ? 'px-6 py-2.5 rounded-xl bg-[#3B82F6] shadow-lg shadow-blue-500/20 text-white text-xs font-bold transition-all' : 'px-6 py-2.5 rounded-xl text-slate-500 hover:text-slate-300 text-xs font-bold transition-all'">
+          Verification Email
+        </button>
+        <button (click)="activeTemplateType.set('reset')"
+          [class]="activeTemplateType() === 'reset' ? 'px-6 py-2.5 rounded-xl bg-[#3B82F6] shadow-lg shadow-blue-500/20 text-white text-xs font-bold transition-all' : 'px-6 py-2.5 rounded-xl text-slate-500 hover:text-slate-300 text-xs font-bold transition-all'">
+          Password Reset
+        </button>
+      </div>
+
+      <div class="space-y-8 animate-in fade-in duration-500">
+        <!-- Subject -->
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Email Subject</label>
+          @if (activeTemplateType() === 'verification') {
+          <input type="text" [ngModel]="systemSettings().VerificationEmailSubject"
+            (ngModelChange)="updateSystemSetting('VerificationEmailSubject', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="Verify your account">
+          } @else {
+          <input type="text" [ngModel]="systemSettings().PasswordResetEmailSubject"
+            (ngModelChange)="updateSystemSetting('PasswordResetEmailSubject', $event)"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="Password Reset Request">
+          }
+        </div>
+
+        <!-- HTML Body -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center mb-1 px-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">HTML Template
+              Editor</label>
+            <span class="text-[10px] text-amber-500/80 font-bold flex items-center gap-1">
+              <span class="material-icons text-[12px]">info</span>
+              Use {{ activeTemplateType() === 'verification' ? '{{VerificationLink}}' : '{{ResetLink}}' }} for the
+              placeholder
+            </span>
+          </div>
+
+          <div
+            class="quill-dark-wrapper rounded-2xl overflow-hidden border border-white/5 bg-[#0a1128]/30 shadow-inner">
+            @if (activeTemplateType() === 'verification') {
+            <quill-editor [ngModel]="systemSettings().VerificationEmailHtmlBody"
+              (ngModelChange)="updateSystemSetting('VerificationEmailHtmlBody', $event)"
+              [modules]="{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'clean']] }"
+              placeholder="Design your verification email..." class="block w-full min-h-[400px]"></quill-editor>
+            } @else {
+            <quill-editor [ngModel]="systemSettings().PasswordResetEmailHtmlBody"
+              (ngModelChange)="updateSystemSetting('PasswordResetEmailHtmlBody', $event)"
+              [modules]="{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'clean']] }"
+              placeholder="Design your password reset email..." class="block w-full min-h-[400px]"></quill-editor>
+            }
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex gap-2">
+            <button (click)="resetToDefaultTemplate()" [disabled]="isSavingSettings() || isLoadingSettings()"
+              class="px-5 py-4 border border-white/5 hover:bg-white/5 text-slate-400 font-bold tracking-wide rounded-xl transition-all">
+              Reset
+            </button>
+            <button (click)="sendTestEmail()" [disabled]="isSendingTest() || isSavingSettings() || isLoadingSettings()"
+              class="px-5 py-4 border border-white/5 hover:bg-white/5 text-indigo-400 font-bold tracking-wide rounded-xl transition-all flex items-center gap-2">
+              @if (isSendingTest()) {
+              <div class="w-4 h-4 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+              } @else {
+              <span class="material-icons text-[18px]">send</span>
+              }
+              Send Test
+            </button>
+          </div>
+          <button (click)="saveSystemSettings()" [disabled]="isSavingSettings() || isLoadingSettings()"
+            class="flex-1 px-6 py-4 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20">
+            {{ isSavingSettings() ? 'Updating System...' : 'Save Template' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    } @else if (activeTab() === 'branding') {
+
+    <!-- System Branding Fragment -->
+    <div
+      class="w-full mt-4 bg-[#111827]/40 rounded-3xl border border-white/5 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+      <h2 class="text-xl font-bold mb-8 text-white">System Default Branding</h2>
+      <p class="text-slate-400 text-xs mb-8">This branding applies to the login page and any events that haven't set
+        their own custom branding.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <!-- Colors -->
+        <div class="space-y-6">
+          <h3 class="text-base font-bold text-indigo-400 mb-4 flex items-center gap-2">
+            <span class="material-icons text-[18px]">palette</span> Branding Colors
+          </h3>
+
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Primary Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="systemSettings().BrandingPrimaryColor"
+                  (ngModelChange)="updateSystemSetting('BrandingPrimaryColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="systemSettings().BrandingPrimaryColor"
+                  (ngModelChange)="updateSystemSetting('BrandingPrimaryColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Secondary
+                Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="systemSettings().BrandingSecondaryColor"
+                  (ngModelChange)="updateSystemSetting('BrandingSecondaryColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="systemSettings().BrandingSecondaryColor"
+                  (ngModelChange)="updateSystemSetting('BrandingSecondaryColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Background -->
+        <div class="space-y-6">
+          <h3 class="text-base font-bold text-indigo-400 mb-4 flex items-center gap-2">
+            <span class="material-icons text-[18px]">wallpaper</span> Background Style
+          </h3>
+
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Type</label>
+              <div class="flex gap-3 mt-2">
+                <button (click)="updateSystemSetting('BrandingBackgroundType', 'color')"
+                  [class]="systemSettings().BrandingBackgroundType === 'color' ? 'px-4 py-2 rounded-lg bg-[#3B82F6]/20 border border-[#3B82F6] text-[#3B82F6] text-xs font-bold' : 'px-4 py-2 rounded-lg bg-white/5 border border-white/5 text-slate-500 text-xs font-bold'">
+                  Solid Color
+                </button>
+                <button (click)="updateSystemSetting('BrandingBackgroundType', 'image')"
+                  [class]="systemSettings().BrandingBackgroundType === 'image' ? 'px-4 py-2 rounded-lg bg-[#3B82F6]/20 border border-[#3B82F6] text-[#3B82F6] text-xs font-bold' : 'px-4 py-2 rounded-lg bg-white/5 border border-white/5 text-slate-500 text-xs font-bold'">
+                  Background Image
+                </button>
+              </div>
+            </div>
+
+            @if (systemSettings().BrandingBackgroundType === 'color') {
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="systemSettings().BrandingBackgroundColor"
+                  (ngModelChange)="updateSystemSetting('BrandingBackgroundColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="systemSettings().BrandingBackgroundColor"
+                  (ngModelChange)="updateSystemSetting('BrandingBackgroundColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+            } @else {
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Image</label>
+              <div class="flex flex-col gap-3">
+                <button (click)="bgInput.click()"
+                  class="w-full px-4 py-3 bg-white/5 border border-white/10 border-dashed rounded-xl text-xs text-slate-400 hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+                  <span class="material-icons text-[18px]">upload_file</span>
+                  {{ systemSettings().BrandingBackgroundImage ? 'Replace Image' : 'Upload Image' }}
+                </button>
+                <input #bgInput type="file" (change)="onBackgroundImageSelected($event)" accept=".png,.jpg,.jpeg"
+                  class="hidden">
+
+                @if (systemSettings().BrandingBackgroundImage) {
+                <div class="relative group rounded-xl overflow-hidden aspect-video border border-white/10 bg-black/40">
+                  <img [src]="systemSettings().BrandingBackgroundImage" class="w-full h-full object-cover">
+                  <button (click)="updateSystemSetting('BrandingBackgroundImage', '')"
+                    class="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-icons text-[14px] text-white">delete</span>
+                  </button>
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <button (click)="saveSystemSettings()" [disabled]="isSavingSettings() || isLoadingSettings()"
+        class="w-full px-6 py-4 mt-12 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20">
+        {{ isSavingSettings() ? 'Saving Branding...' : 'Apply System Branding' }}
+      </button>
+    </div>
+    }
+
+</div>
+</main>
+
+<!-- Footer Info -->
+<footer class="h-16 w-full flex items-center justify-center shrink-0 border-t border-white/[0.02]">
+  <a href="https://itmaskinen.se/" target="_blank" rel="noopener noreferrer"
+    class="text-[9px] font-black text-slate-600 hover:text-slate-400 no-underline transition-colors uppercase tracking-[0.2em]">
+    &copy; 2026 ITmaskinen Sverige AB. All rights reserved.
+  </a>
+</footer>
+
+<!-- Company Branding Modal -->
+@if (showBrandingModal()) {
+<div
+  class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+  <div
+    class="w-full max-w-2xl bg-[#111827] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+
+    <!-- Modal Header -->
+    <div class="px-8 py-6 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
+      <div>
+        <h2 class="text-xl font-bold text-white mb-1">Event Branding</h2>
+        <p class="text-xs text-slate-400">Customizing branding for <span class="text-[#3B82F6] font-bold">{{
+            selectedCompanyForBranding()?.name }}</span></p>
+      </div>
+      <button (click)="closeBrandingModal()"
+        class="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-all">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-8 overflow-y-auto max-h-[70vh] custom-scrollbar">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Colors -->
+        <div class="space-y-6">
+          <h3 class="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+            <span class="material-icons text-[16px]">palette</span> Branding Colors
+          </h3>
+
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Primary Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="companyBrandingForm().BrandingPrimaryColor"
+                  (ngModelChange)="updateModalBranding('BrandingPrimaryColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="companyBrandingForm().BrandingPrimaryColor"
+                  (ngModelChange)="updateModalBranding('BrandingPrimaryColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Secondary
+                Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="companyBrandingForm().BrandingSecondaryColor"
+                  (ngModelChange)="updateModalBranding('BrandingSecondaryColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="companyBrandingForm().BrandingSecondaryColor"
+                  (ngModelChange)="updateModalBranding('BrandingSecondaryColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Background Selection -->
+        <div class="space-y-6">
+          <h3 class="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+            <span class="material-icons text-[16px]">wallpaper</span> Background Style
+          </h3>
+
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Type</label>
+              <div class="flex gap-2 mt-2">
+                <button (click)="updateModalBranding('BrandingBackgroundType', 'color')"
+                  [class]="companyBrandingForm().BrandingBackgroundType === 'color' ? 'flex-1 px-3 py-2 rounded-lg bg-[#3B82F6]/20 border border-[#3B82F6] text-[#3B82F6] text-[10px] font-bold uppercase transition-all' : 'flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-slate-500 text-[10px] font-bold uppercase hover:bg-white/10 transition-all'">
+                  Solid Color
+                </button>
+                <button (click)="updateModalBranding('BrandingBackgroundType', 'image')"
+                  [class]="companyBrandingForm().BrandingBackgroundType === 'image' ? 'flex-1 px-3 py-2 rounded-lg bg-[#3B82F6]/20 border border-[#3B82F6] text-[#3B82F6] text-[10px] font-bold uppercase transition-all' : 'flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-slate-500 text-[10px] font-bold uppercase hover:bg-white/10 transition-all'">
+                  Image
+                </button>
+              </div>
+            </div>
+
+            @if (companyBrandingForm().BrandingBackgroundType === 'color') {
+            <div class="space-y-2">
+              <label class="text-[10px) font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" [ngModel]="companyBrandingForm().BrandingBackgroundColor"
+                  (ngModelChange)="updateModalBranding('BrandingBackgroundColor', $event)"
+                  class="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [ngModel]="companyBrandingForm().BrandingBackgroundColor"
+                  (ngModelChange)="updateModalBranding('BrandingBackgroundColor', $event)"
+                  class="flex-1 bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+            } @else {
+            <div class="space-y-2">
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Background
+                Image</label>
+              <div class="flex flex-col gap-3">
+                <button (click)="modalBgInput.click()"
+                  class="w-full px-4 py-3 bg-white/5 border border-white/10 border-dashed rounded-xl text-xs text-slate-400 hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+                  <span class="material-icons text-[18px]">upload_file</span>
+                  {{ companyBrandingForm().BrandingBackgroundImage ? 'Change Image' : 'Select Image' }}
+                </button>
+                <input #modalBgInput type="file" (change)="onModalBackgroundImageSelected($event)"
+                  accept=".png,.jpg,.jpeg" class="hidden">
+
+                @if (companyBrandingForm().BrandingBackgroundImage) {
+                <div class="relative group rounded-xl overflow-hidden aspect-video border border-white/10 bg-black/40">
+                  <img [src]="companyBrandingForm().BrandingBackgroundImage" class="w-full h-full object-cover">
+                  <button (click)="updateModalBranding('BrandingBackgroundImage', '')"
+                    class="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-icons text-[14px] text-white">delete</span>
+                  </button>
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-8 py-6 bg-white/[0.03] border-t border-white/5 flex gap-3">
+      <button (click)="closeBrandingModal()" [disabled]="isSavingCompanyBranding()"
+        class="flex-1 px-6 py-3 border border-white/5 hover:bg-white/5 text-slate-400 font-bold tracking-wide rounded-xl transition-all">
+        Cancel
+      </button>
+      <button (click)="saveCompanyBranding()" [disabled]="isSavingCompanyBranding()"
+        class="flex-1 px-6 py-3 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+        {{ isSavingCompanyBranding() ? 'Saving...' : 'Apply Branding' }}
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Account Security Modal -->
+@if (showSecurityModal()) {
+<div
+  class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+  <div
+    class="w-full max-w-lg bg-[#111827] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    <!-- Modal Header -->
+    <div class="px-8 py-6 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
+      <h2 class="text-xl font-bold text-white">Update Password</h2>
+      <button (click)="showSecurityModal.set(false)"
+        class="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-all">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-8">
+      <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Current Password</label>
+          <input type="password" formControlName="currentPassword"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="••••••••">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">New Password</label>
+          <input type="password" formControlName="newPassword"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="••••••••">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Confirm New
+            Password</label>
+          <input type="password" formControlName="confirmPassword"
+            class="w-full bg-[#0a1128]/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6]/70 outline-none transition-all shadow-inner"
+            placeholder="••••••••">
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" (click)="showSecurityModal.set(false)" [disabled]="isUpdatingPassword"
+            class="flex-1 px-6 py-4 border border-white/5 hover:bg-white/5 text-slate-400 font-bold tracking-wide rounded-xl transition-all">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="passwordForm.invalid || isUpdatingPassword"
+            class="flex-[2] px-6 py-4 bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-blue-500/20">
+            {{ isUpdatingPassword ? 'Updating...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Event Switcher Modal -->
+@if (showEventSwitcherModal()) {
+<div class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-sm" (click)="closeEventSwitcher()"></div>
+  
+  <div class="relative w-full max-w-lg bg-[#1e293b] rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <!-- Modal Header -->
+    <div class="px-8 py-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+          <span class="material-icons text-indigo-400">swap_horiz</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white leading-tight">Switch Event</h3>
+          <p class="text-xs text-slate-400 mt-1">Select an event for <span class="text-indigo-400 font-bold">{{ selectedAccountForEvents()?.name }}</span></p>
+        </div>
+      </div>
+      <button (click)="closeEventSwitcher()" class="p-2 hover:bg-white/5 rounded-full text-slate-500 transition-colors">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+      @if (isLoadingEvents()) {
+        <div class="flex flex-col items-center justify-center py-20 text-indigo-400/50">
+          <div class="w-8 h-8 flex items-center justify-center">
+            <div class="w-6 h-6 border-2 border-indigo-500/30 border-t-[#3B82F6] rounded-full animate-spin"></div>
+          </div>
+          <p class="text-xs font-bold uppercase tracking-widest animate-pulse mt-4">Loading Events...</p>
+        </div>
+      } @else {
+        <div class="grid gap-3">
+          @for (event of accountEvents(); track event.id) {
+            <div (click)="selectAccountEvent(event.id)"
+                 class="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-indigo-500/30 hover:bg-white/[0.05] transition-all cursor-pointer group">
+              <div class="flex flex-col">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors">{{ event.name }}</span>
+                  @if (event.isParent) {
+                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-black uppercase tracking-widest">Parent</span>
+                  } @else {
+                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-black uppercase tracking-widest">Sub-Event</span>
+                  }
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] text-slate-500">{{ event.createdAt | date:'MMM d, yyyy' }}</span>
+                  <div class="flex items-center gap-1">
+                    <span class="material-icons text-[12px] text-slate-500">people</span>
+                    <span class="text-[10px] text-slate-400">{{ event.participantCount }} participants</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-all">
+                <span class="material-icons text-[18px]">chevron_right</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-8 py-4 bg-white/[0.02] border-t border-white/5 flex justify-end">
+      <button (click)="closeEventSwitcher()" 
+              class="px-5 py-2 text-xs font-bold text-slate-400 hover:text-white transition-colors">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Create Event Modal -->
+@if (showCreateEventModal()) {
+<div class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-sm" (click)="closeCreateEventModal()"></div>
+  
+  <div class="relative w-full max-w-3xl bg-[#1e293b] rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div class="px-8 py-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center">
+          <span class="material-icons text-[#3B82F6]">rocket_launch</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white leading-tight">Create First Event</h3>
+          <p class="text-xs text-slate-400 mt-1">Setup your very first matchmaking project with AI-powered assistance</p>
+        </div>
+      </div>
+      <button (click)="closeCreateEventModal()" class="p-2 hover:bg-white/5 rounded-full text-slate-500 transition-colors">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="p-8 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="input-group">
+          <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1.5 block">Event Name *</label>
+          <input type="text" [(ngModel)]="newEventData().projectName" placeholder="e.g. Summer Networking 2026"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#3B82F6] transition-all outline-none">
+        </div>
+        <div class="input-group">
+          <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1.5 block">City *</label>
+          <input type="text" [(ngModel)]="newEventData().city" placeholder="e.g. Stockholm"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#3B82F6] transition-all outline-none">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1.5 block">Event Description (AI Prompt) *</label>
+        <textarea [(ngModel)]="newEventData().description" rows="3" 
+          placeholder="Describe the goals and focus of your event. For example: A matchmaking event for tech startups to connect with investors looking for seed/Series A funding."
+          class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#3B82F6] transition-all outline-none resize-none"></textarea>
+      </div>
+
+      <!-- Generate AI Recommendations CTA -->
+      <div class="p-4 bg-indigo-500/5 rounded-2xl border border-indigo-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-black uppercase tracking-widest text-indigo-300">AI Recommendations</span>
+          <span class="text-xs text-slate-400">Optimize role selection, custom questions, and email templates for your specific event.</span>
+        </div>
+        <button (click)="generateAiRecommendation()" 
+          [disabled]="isGeneratingRecommendation() || !newEventData().description"
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-white flex items-center gap-2 whitespace-nowrap transition-all duration-300 shadow-xl shadow-indigo-500/10 disabled:opacity-50 text-xs">
+          @if (isGeneratingRecommendation()) {
+            <span class="material-icons animate-spin text-sm">sync</span> Generating...
+          } @else {
+            <span class="material-icons text-sm">auto_awesome</span> Get Recommendations
+          }
+        </button>
+      </div>
+
+      <!-- AI Recommendations Display Block -->
+      @if (aiRecommendation()) {
+        <div class="space-y-4 p-5 bg-white/[0.02] border border-white/5 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+          <h4 class="text-xs font-extrabold tracking-widest text-emerald-400 uppercase flex items-center gap-2 m-0">
+            <span class="material-icons text-sm">verified</span> Recommended Event Setup
+          </h4>
+
+          <div class="grid grid-cols-1 gap-5">
+            <!-- Roles Section -->
+            @if (aiRecommendation().roles && aiRecommendation().roles.length > 0) {
+              <div class="space-y-2">
+                <div class="flex items-center justify-between bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 mb-2">
+                  <div class="flex flex-col">
+                    <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide">Role Selections</span>
+                    <span class="text-[10px] text-slate-400 mt-0.5">Enable or disable role selection for participants</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-widest" [class.text-emerald-400]="newEventData().roleSelectionEnabled" [class.text-slate-500]="!newEventData().roleSelectionEnabled">
+                      {{ newEventData().roleSelectionEnabled ? 'Enabled' : 'Disabled' }}
+                    </span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" class="sr-only peer" 
+                             [checked]="newEventData().roleSelectionEnabled"
+                             (change)="newEventData().roleSelectionEnabled = !newEventData().roleSelectionEnabled">
+                      <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 border border-white/5"></div>
+                    </label>
+                  </div>
+                </div>
+
+                @if (newEventData().roleSelectionEnabled) {
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @for (role of aiRecommendation().roles; track $index) {
+                      <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                        <div class="text-xs font-bold text-white mb-0.5">{{ role.name }}</div>
+                        <div class="text-[11px] text-slate-400">{{ role.description }}</div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Questions Section -->
+            @if (aiRecommendation().questions && aiRecommendation().questions.length > 0) {
+              <div class="space-y-2">
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide">Custom Questions</span>
+                <div class="space-y-2">
+                  @for (q of aiRecommendation().questions; track $index) {
+                    <div class="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between gap-3">
+                      <div class="flex flex-col gap-0.5">
+                        <span class="text-xs font-bold text-white">{{ q.title }}</span>
+                        <span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{{ q.type }}</span>
+                      </div>
+                      @if (q.options && q.options.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (opt of q.options; track opt) {
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300">{{ opt }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Email Template Sections -->
+            @if (aiRecommendation().emailTemplate || aiRecommendation().resultEmailTemplate || aiRecommendation().feedbackEmailTemplate) {
+              <div class="space-y-4">
+                @if (aiRecommendation().emailTemplate) {
+                  <div class="space-y-2">
+                    <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide">Invitation Email Template Preview</span>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-xl max-h-48 overflow-y-auto custom-scrollbar">
+                      <div class="text-xs text-slate-300 leading-relaxed break-words" [innerHTML]="aiRecommendation().emailTemplate"></div>
+                    </div>
+                  </div>
+                }
+
+                @if (aiRecommendation().resultEmailTemplate) {
+                  <div class="space-y-2">
+                    <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide">Result Email Template Preview</span>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-xl max-h-48 overflow-y-auto custom-scrollbar">
+                      <div class="text-xs text-slate-300 leading-relaxed break-words" [innerHTML]="aiRecommendation().resultEmailTemplate"></div>
+                    </div>
+                  </div>
+                }
+
+                @if (aiRecommendation().feedbackEmailTemplate) {
+                  <div class="space-y-2">
+                    <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide">Feedback Request Email Template Preview</span>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-xl max-h-48 overflow-y-auto custom-scrollbar">
+                      <div class="text-xs text-slate-300 leading-relaxed break-words" [innerHTML]="aiRecommendation().feedbackEmailTemplate"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Design & Branding Recommendation -->
+            @if (aiRecommendation().brandingPrimaryColor || aiRecommendation().brandingSecondaryColor || aiRecommendation().brandingBackgroundColor) {
+              <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide block">Design & Branding Recommendations</span>
+                <div class="grid grid-cols-2 gap-3">
+                  @if (aiRecommendation().brandingPrimaryColor) {
+                    <div class="flex items-center gap-2">
+                      <div class="w-5 h-5 rounded-md border border-white/20" [style.background-color]="aiRecommendation().brandingPrimaryColor"></div>
+                      <span class="text-xs text-slate-400">Primary Color:</span>
+                      <span class="text-xs font-bold text-white uppercase">{{ aiRecommendation().brandingPrimaryColor }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().brandingSecondaryColor) {
+                    <div class="flex items-center gap-2">
+                      <div class="w-5 h-5 rounded-md border border-white/20" [style.background-color]="aiRecommendation().brandingSecondaryColor"></div>
+                      <span class="text-xs text-slate-400">Secondary:</span>
+                      <span class="text-xs font-bold text-white uppercase">{{ aiRecommendation().brandingSecondaryColor }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().brandingBackgroundColor) {
+                    <div class="flex items-center gap-2">
+                      <div class="w-5 h-5 rounded-md border border-white/20" [style.background-color]="aiRecommendation().brandingBackgroundColor"></div>
+                      <span class="text-xs text-slate-400">Background:</span>
+                      <span class="text-xs font-bold text-white uppercase">{{ aiRecommendation().brandingBackgroundColor }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().brandingBackgroundType) {
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-slate-400">BG Type:</span>
+                      <span class="text-xs font-bold text-white capitalize">{{ aiRecommendation().brandingBackgroundType }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Edit Page Text Recommendation -->
+            @if (aiRecommendation().welcomeTitle || aiRecommendation().welcomeTagline || aiRecommendation().welcomeDescription || aiRecommendation().welcomeButton) {
+              <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wide block">Welcome & Edit Page Text</span>
+                <div class="space-y-2">
+                  @if (aiRecommendation().welcomeTitle) {
+                    <div>
+                      <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Title</span>
+                      <span class="text-xs text-white font-medium">{{ aiRecommendation().welcomeTitle }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().welcomeTagline) {
+                    <div>
+                      <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Tagline</span>
+                      <span class="text-xs text-white font-medium">{{ aiRecommendation().welcomeTagline }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().welcomeDescription) {
+                    <div>
+                      <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Description</span>
+                      <span class="text-xs text-white/80 leading-relaxed font-medium block">{{ aiRecommendation().welcomeDescription }}</span>
+                    </div>
+                  }
+                  @if (aiRecommendation().welcomeButton) {
+                    <div>
+                      <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Button Text</span>
+                      <span class="text-xs text-white font-bold">{{ aiRecommendation().welcomeButton }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="px-8 py-6 bg-white/[0.02] border-t border-white/5 flex justify-end gap-3">
+      <button class="px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 transition-all"
+        (click)="closeCreateEventModal()" [disabled]="isCreatingEvent()">Cancel</button>
+      <button
+        class="px-8 py-2.5 rounded-xl text-sm font-bold text-white bg-[#3B82F6] hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+        (click)="createEvent()"
+        [disabled]="isCreatingEvent() || !newEventData().projectName || !newEventData().city">
+        @if (isCreatingEvent()) {
+        <span class="material-icons animate-spin text-sm">sync</span> Creating...
+        } @else {
+        <span class="material-icons text-sm">rocket_launch</span> Create Event
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+  <!-- Account Details Modal -->
+  @if (showAccountDetailsModal()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeAccountDetails()"></div>
+      <div class="relative w-full max-w-lg bg-[#0B1120] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="p-6 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Account Details</h2>
+            <p class="text-xs text-slate-400 mt-1">Update event and administrator information</p>
+          </div>
+          <button (click)="closeAccountDetails()" class="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+  
+        <!-- Form -->
+        <form [formGroup]="accountForm" (ngSubmit)="saveAccountDetails()" class="p-6 flex flex-col gap-6 overflow-y-auto max-h-[70vh]">
+          
+          <!-- Event Status Header -->
+          <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+            <div class="flex items-center gap-3">
+              @if (selectedAccountDetails()?.isVerified) {
+                <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                <span class="text-sm font-bold text-emerald-400 uppercase tracking-widest">Active Account</span>
+              } @else if (selectedAccountDetails()?.isDeactivated) {
+                <div class="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                <span class="text-sm font-bold text-red-400 uppercase tracking-widest">Deactivated Account</span>
+              } @else {
+                <div class="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
+                <span class="text-sm font-bold text-amber-400 uppercase tracking-widest">Pending Verification</span>
+              }
+            </div>
+            
+            <div class="flex gap-2">
+              @if (!selectedAccountDetails()?.isVerified) {
+                <button type="button" (click)="manualVerify()"
+                  class="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-widest rounded-lg border border-emerald-500/20 transition-all">
+                  {{ selectedAccountDetails()?.isDeactivated ? 'Reactivate' : 'Manual Verify' }}
+                </button>
+              } @else {
+                <button type="button" (click)="deactivateAccount()"
+                  class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold uppercase tracking-widest rounded-lg border border-red-500/20 transition-all">
+                  Deactivate
+                </button>
+              }
+            </div>
+          </div>
+  
+          <!-- Event Details -->
+          <div class="flex flex-col gap-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-2">Event Information</h3>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-slate-300 ml-1">Event Name</label>
+              <input type="text" formControlName="companyName"
+                class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+                placeholder="Enter event name">
+            </div>
+          </div>
+  
+          <!-- Admin Details -->
+          <div class="flex flex-col gap-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 border-b border-white/5 pb-2">Administrator Profile</h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-medium text-slate-300 ml-1">First Name</label>
+                <input type="text" formControlName="adminFirstName"
+                  class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+                  placeholder="First name">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-medium text-slate-300 ml-1">Last Name</label>
+                <input type="text" formControlName="adminLastName"
+                  class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+                  placeholder="Last name">
+              </div>
+            </div>
+  
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-slate-300 ml-1">Email Address</label>
+              <input type="email" formControlName="adminEmail"
+                class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+                placeholder="admin@example.com">
+            </div>
+            
+            <div class="flex flex-col gap-1.5 mt-2">
+              <label class="text-xs font-medium text-slate-300 ml-1">Change Password (Optional)</label>
+              <input type="password" formControlName="newPassword"
+                class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+                placeholder="Enter new password to override">
+            </div>
+          </div>
+  
+        </form>
+  
+        <!-- Footer -->
+        <div class="p-5 border-t border-white/5 flex items-center justify-end gap-3 bg-white/[0.01]">
+          <button (click)="closeAccountDetails()" type="button"
+            class="px-5 py-2.5 text-sm font-bold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            Cancel
+          </button>
+          <button (click)="saveAccountDetails()" type="submit" [disabled]="accountForm.invalid || isSavingDetails()"
+            class="px-6 py-2.5 bg-[#3B82F6] hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-[#3B82F6] text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2">
+            @if (isSavingDetails()) {
+              <div class="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
+              Saving...
+            } @else {
+              <span class="material-icons text-sm">save</span>
+              Save Changes
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (showDeleteModal()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-sm" (click)="closeDeleteModal()"></div>
+      <div class="relative w-full max-w-md bg-[#0f172a] rounded-2xl border border-red-500/20 shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="p-6 border-b border-white/5 flex items-center gap-4 bg-red-500/5">
+          <div class="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-red-500">warning_amber</span>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Delete Event</h2>
+            <p class="text-xs text-red-400 mt-1">This action cannot be undone.</p>
+          </div>
+        </div>
+  
+        <!-- Form -->
+        <div class="p-6 flex flex-col gap-4">
+          <p class="text-sm text-slate-300">
+            You are about to permanently delete the event 
+            <span class="font-bold text-white">"{{ projectToDelete()?.name }}"</span>. 
+            All data associated with this event will be lost.
+          </p>
+          
+          <div class="flex flex-col gap-2 mt-2">
+            <label class="text-xs font-medium text-slate-400 ml-1">
+              Please type <span class="font-bold text-white select-all">{{ projectToDelete()?.name }}</span> to confirm.
+            </label>
+            <input type="text" [ngModel]="deleteConfirmText()" (ngModelChange)="deleteConfirmText.set($event)"
+              class="w-full bg-[#111827] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+              placeholder="Enter event name">
+          </div>
+        </div>
+  
+        <!-- Footer -->
+        <div class="p-5 border-t border-white/5 flex items-center justify-end gap-3 bg-white/[0.01]">
+          <button (click)="closeDeleteModal()" type="button"
+            class="px-5 py-2.5 text-sm font-bold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            Cancel
+          </button>
+          <button (click)="confirmDeleteProject()" type="button" [disabled]="deleteConfirmText() !== projectToDelete()?.name || isDeleting()"
+            class="px-6 py-2.5 bg-red-500 hover:bg-red-400 disabled:opacity-50 disabled:hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-red-500/25 flex items-center gap-2">
+            @if (isDeleting()) {
+              <div class="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
+              Deleting...
+            } @else {
+              <span class="material-icons text-sm">delete_forever</span>
+              Delete Event
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Deactivate Confirmation Modal -->
+  @if (showDeactivateModal()) {
+    <div class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-sm" (click)="closeDeactivateModal()"></div>
+      <div class="relative w-full max-w-md bg-[#0f172a] rounded-2xl border border-red-500/20 shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="p-6 border-b border-white/5 flex items-center gap-4 bg-red-500/5">
+          <div class="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-red-500">block</span>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Deactivate Account</h2>
+            <p class="text-xs text-red-400 mt-1">Block access for this administrator.</p>
+          </div>
+        </div>
+  
+        <!-- Body -->
+        <div class="p-6 flex flex-col gap-4">
+          <p class="text-sm text-slate-300">
+            Are you sure you want to deactivate the account for 
+            <span class="font-bold text-white">{{ accountToDeactivate()?.adminEmail }}</span>? 
+          </p>
+          <p class="text-sm text-slate-400">
+            They will immediately lose access and will not be able to log in to the platform until you reactivate their account.
+          </p>
+        </div>
+  
+        <!-- Footer -->
+        <div class="p-5 border-t border-white/5 flex items-center justify-end gap-3 bg-white/[0.01]">
+          <button (click)="closeDeactivateModal()" type="button"
+            class="px-5 py-2.5 text-sm font-bold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            Cancel
+          </button>
+          <button (click)="confirmDeactivateAccount()" type="button" [disabled]="isDeactivating()"
+            class="px-6 py-2.5 bg-red-500 hover:bg-red-400 disabled:opacity-50 disabled:hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-red-500/25 flex items-center gap-2">
+            @if (isDeactivating()) {
+              <div class="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
+              Deactivating...
+            } @else {
+              <span class="material-icons text-sm">block</span>
+              Deactivate Account
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Verify Confirmation Modal -->
+  @if (showVerifyModal()) {
+    <div class="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-sm" (click)="closeVerifyModal()"></div>
+      <div class="relative w-full max-w-md bg-[#0f172a] rounded-2xl border border-emerald-500/20 shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="p-6 border-b border-white/5 flex items-center gap-4 bg-emerald-500/5">
+          <div class="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-icons text-emerald-500">verified</span>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Verify Account</h2>
+            <p class="text-xs text-emerald-400 mt-1">Grant access to this administrator.</p>
+          </div>
+        </div>
+  
+        <!-- Body -->
+        <div class="p-6 flex flex-col gap-4">
+          <p class="text-sm text-slate-300">
+            Are you sure you want to manually verify the account for 
+            <span class="font-bold text-white">{{ accountToVerify()?.adminEmail }}</span>? 
+          </p>
+          <p class="text-sm text-slate-400">
+            They will immediately gain full access to the platform as an active administrator.
+          </p>
+        </div>
+  
+        <!-- Footer -->
+        <div class="p-5 border-t border-white/5 flex items-center justify-end gap-3 bg-white/[0.01]">
+          <button (click)="closeVerifyModal()" type="button"
+            class="px-5 py-2.5 text-sm font-bold text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            Cancel
+          </button>
+          <button (click)="confirmVerifyAccount()" type="button" [disabled]="isVerifying()"
+            class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center gap-2">
+            @if (isVerifying()) {
+              <div class="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
+              Verifying...
+            } @else {
+              <span class="material-icons text-sm">check_circle</span>
+              Verify Account
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

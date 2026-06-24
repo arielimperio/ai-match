@@ -1,0 +1,38 @@
+/* Only pseudo-element and CSS-variable-dependent styles */
+
+/* Profile header name badge */
+.profile-header-name {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+}
+
+/* Button consistency with welcome/question pages - target only main nav buttons */
+.button-group .btn,
+.button-group .btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 52px !important;
+  line-height: normal !important;
+  padding: 0 32px !important;
+  gap: 10px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.button-group .btn span,
+.button-group .btn-primary span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin-top: -1px;
+  /* Micro-adjustment for the arrow alignment */
+}

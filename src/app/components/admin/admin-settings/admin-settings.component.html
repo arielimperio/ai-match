@@ -1,0 +1,914 @@
+<div class="flex flex-col gap-6">
+  <!-- Tab Bar — scrollable on mobile, pill style -->
+  <div class="flex gap-2 p-2 rounded-2xl border border-white/10 bg-white/[0.03] overflow-x-auto">
+    <button class="tab-item shrink-0" [class.active]="activeTab() === 'design'" (click)="switchTab('design')">
+      <span class="material-icons" style="font-size:18px">palette</span>
+      <span class="hidden sm:inline">Design &amp; Branding</span>
+      <span class="sm:hidden">Design</span>
+    </button>
+    <button class="tab-item shrink-0" [class.active]="activeTab() === 'text'" (click)="switchTab('text')">
+      <span class="material-icons" style="font-size:18px">edit_note</span>
+      <span class="hidden sm:inline">Edit Text</span>
+      <span class="sm:hidden">Text</span>
+    </button>
+    <button class="tab-item shrink-0" [class.active]="activeTab() === 'roles'" (click)="switchTab('roles')">
+      <span class="material-icons" style="font-size:18px">person_search</span>
+      <span class="hidden sm:inline">Role Selection</span>
+      <span class="sm:hidden">Roles</span>
+    </button>
+    <button class="tab-item shrink-0" [class.active]="activeTab() === 'data'" (click)="switchTab('data')">
+      <span class="material-icons" style="font-size:18px">storage</span>
+      <span class="hidden sm:inline">Data Management</span>
+      <span class="sm:hidden">Data</span>
+    </button>
+     <button class="tab-item shrink-0" [class.active]="activeTab() === 'email'" (click)="switchTab('email')">
+       <span class="material-icons" style="font-size:18px">email</span>
+       Email Templates
+     </button>
+     <button class="tab-item shrink-0" [class.active]="activeTab() === 'admins'" (click)="switchTab('admins')">
+       <span class="material-icons" style="font-size:18px">admin_panel_settings</span>
+       <span class="hidden sm:inline">Admins</span>
+       <span class="sm:hidden">Admins</span>
+     </button>
+     <button class="tab-item shrink-0" [class.active]="activeTab() === 'schedule'" (click)="switchTab('schedule')">
+       <span class="material-icons" style="font-size:18px">event</span>
+       <span class="hidden sm:inline">Schedule</span>
+       <span class="sm:hidden">Schedule</span>
+     </button>
+
+  </div>
+
+  <!-- Settings Content -->
+  <div class="grid gap-6 pb-20 sm:pb-28" [class.grid-cols-1]="true"
+    [class.lg:grid-cols-2]="activeTab() === 'design' || activeTab() === 'text'">
+
+    <!-- ===== DESIGN & BRANDING TAB ===== -->
+    @if (activeTab() === 'design') {
+    <div class="panel">
+      <h2 class="panel-title"><span>🎨</span> Design &amp; Branding</h2>
+
+      @if (isLoading()) {
+      <div class="animate-pulse flex flex-col gap-5 py-2">
+        @for (i of [1,2,3,4]; track i) {
+        <div class="flex flex-col gap-2">
+          <div class="h-3 bg-white/10 rounded w-1/4"></div>
+          <div class="h-10 bg-white/[0.06] rounded-xl w-full"></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="flex flex-col gap-5">
+
+        <!-- Logo Type -->
+        <div class="input-group">
+          <label>Logo Type</label>
+          <div class="flex flex-wrap gap-3 mt-2">
+            <label
+              class="flex items-center gap-2 cursor-pointer text-sm text-text-main bg-white/[0.03] px-3 py-2 rounded-md border border-white/10 transition-all">
+              <input type="radio" name="logoType" [checked]="logoType() === 'svg'" (change)="setLogoType('svg')"
+                class="accent-accent">
+              <span>SVG (Code or file)</span>
+            </label>
+            <label
+              class="flex items-center gap-2 cursor-pointer text-sm text-text-main bg-white/[0.03] px-3 py-2 rounded-md border border-white/10 transition-all">
+              <input type="radio" name="logoType" [checked]="logoType() === 'image'" (change)="setLogoType('image')"
+                class="accent-accent">
+              <span>Image (PNG/JPG)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- SVG Logo -->
+        @if (logoType() === 'svg') {
+        <div class="input-group">
+          <div class="flex justify-between items-center mb-2">
+            <label class="!mb-0">Welcome Logo (SVG)</label>
+            <button class="btn-text" (click)="fileInputSvg.click()">
+              <span class="material-icons" style="font-size:16px">upload_file</span> Browse...
+            </button>
+            <input #fileInputSvg type="file" (change)="onFileSelected($event)" accept=".svg" class="hidden">
+          </div>
+          <p class="text-[11px] text-text-muted mb-2">Paste code or browse for a file (SVG recommended for best
+            quality).</p>
+          <textarea [(ngModel)]="settings().WelcomeLogo" placeholder="<svg>...</svg>" rows="8"></textarea>
+        </div>
+        }
+
+        <!-- Image Logo -->
+        @if (logoType() === 'image') {
+        <div class="input-group">
+          <div class="flex justify-between items-center mb-2">
+            <label class="!mb-0">Welcome Logo (Image)</label>
+            <button class="btn-text" (click)="fileInputImg.click()">
+              <span class="material-icons" style="font-size:16px">upload_file</span> Browse...
+            </button>
+            <input #fileInputImg type="file" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg" class="hidden">
+          </div>
+          <p class="text-[11px] text-text-muted mb-2">Upload an image (PNG or JPG).</p>
+          @if (settings().WelcomeLogo) {
+          <div
+            class="bg-[rgba(15,23,42,0.6)] border border-white/10 rounded-lg p-5 flex justify-center items-center mt-2 max-h-[160px] overflow-hidden">
+            <div class="logo-preview" [innerHTML]="sanitizedPreviewLogo()"></div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Background Selection -->
+        <div class="mt-4 pt-6 border-t border-white/10">
+          <h3 class="mb-4 text-base font-semibold text-green">🖼️ Background Style</h3>
+          <div class="input-group">
+            <label>Background Type</label>
+            <div class="flex flex-wrap gap-3 mt-2">
+              <label
+                class="flex items-center gap-2 cursor-pointer text-sm text-text-main bg-white/[0.03] px-3 py-2 rounded-md border border-white/10 transition-all">
+                <input type="radio" name="bgType" [checked]="settings().BrandingBackgroundType === 'color'"
+                  (change)="settings().BrandingBackgroundType = 'color'" class="accent-accent">
+                <span>Solid Color</span>
+              </label>
+              <label
+                class="flex items-center gap-2 cursor-pointer text-sm text-text-main bg-white/[0.03] px-3 py-2 rounded-md border border-white/10 transition-all">
+                <input type="radio" name="bgType" [checked]="settings().BrandingBackgroundType === 'image'"
+                  (change)="settings().BrandingBackgroundType = 'image'" class="accent-accent">
+                <span>Background Image</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Color Picker for Background -->
+          @if (settings().BrandingBackgroundType === 'color') {
+          <div class="input-group">
+            <label>Background Color</label>
+            <div class="flex items-center gap-2">
+              <input type="color" [(ngModel)]="settings().BrandingBackgroundColor"
+                class="w-10 h-10 rounded-lg border border-white/20 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+              <input type="text" [(ngModel)]="settings().BrandingBackgroundColor" placeholder="#002a37" class="flex-1">
+            </div>
+          </div>
+          }
+
+          <!-- Image Upload for Background -->
+          @if (settings().BrandingBackgroundType === 'image') {
+          <div class="input-group">
+            <div class="flex justify-between items-center mb-2">
+              <label class="!mb-0">Background Image</label>
+              <button class="btn-text" (click)="bgInput.click()">
+                <span class="material-icons" style="font-size:16px">upload_file</span> Browse...
+              </button>
+              <input #bgInput type="file" (change)="onBackgroundImageSelected($event)" accept=".png,.jpg,.jpeg"
+                class="hidden">
+            </div>
+            <p class="text-[11px] text-text-muted mb-2">Upload a background image (PNG or JPG). Recommended size: 1920x1080.</p>
+            @if (settings().BrandingBackgroundImage) {
+            <div class="relative group rounded-lg overflow-hidden border border-white/10 aspect-video bg-black/20">
+              <img [src]="settings().BrandingBackgroundImage" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button class="btn btn-sm" (click)="settings().BrandingBackgroundImage = ''">Remove Image</button>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Branding Colors -->
+        <div class="mt-4 pt-6 border-t border-white/10">
+          <h3 class="mb-4 text-base font-semibold text-green">🎨 Branding Colors</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="input-group">
+              <label>Primary Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" [(ngModel)]="settings().BrandingPrimaryColor"
+                  class="w-10 h-10 rounded-lg border border-white/20 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [(ngModel)]="settings().BrandingPrimaryColor" placeholder="#31a2ae" class="flex-1">
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Secondary Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" [(ngModel)]="settings().BrandingSecondaryColor"
+                  class="w-10 h-10 rounded-lg border border-white/20 bg-transparent cursor-pointer p-0.5 overflow-hidden">
+                <input type="text" [(ngModel)]="settings().BrandingSecondaryColor" placeholder="#a60053" class="flex-1">
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-text-muted mt-2">Pick a color or enter a hex code (e.g. #31a2ae).</p>
+        </div>
+
+      </div>
+      }
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="panel">
+      <h2 class="panel-title"><span>👁️</span> Preview</h2>
+      <div
+        class="bg-bg-dark rounded-xl p-5 sm:p-8 min-h-[300px] sm:min-h-[400px] flex items-center justify-center border border-white/10 origin-top scale-[0.9] sm:scale-[0.85]"
+        [style.background-image]="settings().BrandingBackgroundType === 'image' ? 'url(' + settings().BrandingBackgroundImage + ')' : 'none'"
+        [style.background-color]="settings().BrandingBackgroundType === 'color' ? settings().BrandingBackgroundColor : 'transparent'"
+        style="background-size: cover; background-position: center;">
+        <div class="text-left max-w-[400px] w-full">
+          <div class="mb-5 logo-preview overflow-hidden max-h-[120px] flex items-center"
+            [innerHTML]="sanitizedPreviewLogo()"></div>
+          <h1 class="text-2xl mb-1 text-text-main">{{ settings().WelcomeTitle || 'Welcome!' }}</h1>
+          <div class="text-sm text-text-muted uppercase tracking-widest mb-3 font-semibold opacity-80">
+            {{ settings().WelcomeTagline || 'Matchmaking 2026' }}
+          </div>
+          <div class="text-sm text-text-muted leading-snug description-content"
+            [innerHTML]="settings().WelcomeDescription || 'Description will appear here...'"></div>
+          <button
+            class="mt-4 bg-[var(--accent)] text-white border-none rounded-lg px-6 py-3 text-sm font-semibold opacity-85 cursor-default">
+            {{ settings().WelcomeButton || 'Start matchmaking' }} →
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ===== EDIT TEXT TAB ===== -->
+    @if (activeTab() === 'text') {
+    <div class="panel">
+      <h2 class="panel-title"><span>📝</span> Edit Page Texts</h2>
+
+      @if (isLoading()) {
+      <div class="animate-pulse flex flex-col gap-5 py-2">
+        @for (i of [1,2,3,4]; track i) {
+        <div class="flex flex-col gap-2">
+          <div class="h-3 bg-white/10 rounded w-1/4"></div>
+          <div class="h-10 bg-white/[0.06] rounded-xl w-full"></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="flex flex-col gap-5">
+        <!-- Welcome Title -->
+        <div class="input-group">
+          <label>Welcome Title</label>
+          <textarea [(ngModel)]="settings().WelcomeTitle" placeholder="Welcome to..." rows="2"></textarea>
+        </div>
+
+        <!-- Tagline -->
+        <div class="input-group">
+          <label>Tagline (Subtitle)</label>
+          <input type="text" [(ngModel)]="settings().WelcomeTagline" placeholder="Matchmaking 2026">
+        </div>
+
+        <!-- Description -->
+        <div class="input-group">
+          <label>Welcome Description</label>
+          <app-rich-text-editor [(ngModel)]="settings().WelcomeDescription"></app-rich-text-editor>
+        </div>
+
+        <!-- Button Text -->
+        <div class="input-group">
+          <label>Button Text</label>
+          <input type="text" [(ngModel)]="settings().WelcomeButton" placeholder="Start matchmaking">
+        </div>
+
+        <!-- Profile Section -->
+        <div class="mt-8 pt-6 border-t border-white/10">
+          <h3 class="mb-4 text-base font-semibold text-green">👤 Profile Step (Final Step)</h3>
+          <div class="flex flex-col gap-4">
+            <div class="input-group">
+              <label>Profile Page Title</label>
+              <input type="text" [(ngModel)]="settings().ProfileTitle" placeholder="My details">
+            </div>
+            <div class="input-group">
+              <label>Profile Page Description</label>
+              <textarea [(ngModel)]="settings().ProfileDescription" placeholder="Please verify your details..."
+                rows="3"></textarea>
+            </div>
+            <div class="input-group">
+              <label>Success Page Message</label>
+              <textarea [(ngModel)]="settings().SuccessMessage" placeholder="We will send an email..."
+                rows="3"></textarea>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="mt-8 pt-6 border-t border-white/10">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-accent mb-4">Privacy & Consent Texts</h4>
+              <div class="flex flex-col gap-4">
+                <div class="input-group">
+                  <label>Consent Checkbox Text</label>
+                  <textarea [(ngModel)]="settings().ProfileConsentText" placeholder="I agree to..." rows="2"></textarea>
+                </div>
+                <div class="input-group">
+                  <label>Privacy Policy Title</label>
+                  <input type="text" [(ngModel)]="settings().ProfilePrivacyTitle" placeholder="Privacy & Deletion">
+                </div>
+                <div class="input-group">
+                  <label>Privacy Policy Content</label>
+                  <textarea [(ngModel)]="settings().ProfilePrivacyText" placeholder="Details about data usage..." rows="4"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 p-4 bg-white/[0.03] border border-white/10 rounded-xl">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-accent mb-4">Field Visibility</h4>
+              <div class="flex flex-col gap-4">
+                <label class="flex items-center justify-between cursor-pointer group">
+                  <span class="text-sm text-text-main group-hover:text-white transition-colors">Show Role / Title field</span>
+                  <div class="relative inline-flex items-center">
+                    <input type="checkbox" class="sr-only peer" [checked]="settings().ProfileShowRole === 'true'"
+                      (change)="settings().ProfileShowRole = $any($event.target).checked ? 'true' : 'false'">
+                    <div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                  </div>
+                </label>
+                <label class="flex items-center justify-between cursor-pointer group">
+                  <span class="text-sm text-text-main group-hover:text-white transition-colors">Show Company / Organization field</span>
+                  <div class="relative inline-flex items-center">
+                    <input type="checkbox" class="sr-only peer" [checked]="settings().ProfileShowCompany === 'true'"
+                      (change)="settings().ProfileShowCompany = $any($event.target).checked ? 'true' : 'false'">
+                    <div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                  </div>
+                </label>
+                <label class="flex items-center justify-between cursor-pointer group">
+                  <span class="text-sm text-text-main group-hover:text-white transition-colors">Show Photo Upload field</span>
+                  <div class="relative inline-flex items-center">
+                    <input type="checkbox" class="sr-only peer" [checked]="settings().ProfileShowPhoto === 'true'"
+                      (change)="settings().ProfileShowPhoto = $any($event.target).checked ? 'true' : 'false'">
+                    <div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Page Special Labels -->
+        <div class="mt-8 pt-6 border-t border-white/10">
+          <h3 class="mb-4 text-base font-semibold text-green">❓ Question Page Labels</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="input-group">
+              <label>Back Button Text</label>
+              <input type="text" [(ngModel)]="settings().QuestionBackButton" placeholder="Back">
+            </div>
+            <div class="input-group">
+              <label>Next Button Text</label>
+              <input type="text" [(ngModel)]="settings().QuestionNextButton" placeholder="Next">
+            </div>
+            <div class="input-group">
+              <label>"Selected" Counter Text</label>
+              <input type="text" [(ngModel)]="settings().QuestionSelectedText" placeholder="selected">
+            </div>
+            <div class="input-group">
+              <label>"Other" Option Label</label>
+              <input type="text" [(ngModel)]="settings().QuestionOtherLabel" placeholder="Tell us more">
+            </div>
+            <div class="input-group sm:col-span-2">
+              <label>"Other" Option Placeholder</label>
+              <input type="text" [(ngModel)]="settings().QuestionOtherPlaceholder"
+                placeholder="Write your own answer here...">
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="panel">
+      <h2 class="panel-title"><span>👁️</span> Preview</h2>
+      <div
+        class="bg-bg-dark rounded-xl p-5 sm:p-8 min-h-[300px] sm:min-h-[400px] flex items-center justify-center border border-white/10 origin-top scale-[0.9] sm:scale-[0.85]"
+        [style.background-image]="settings().BrandingBackgroundType === 'image' ? 'url(' + settings().BrandingBackgroundImage + ')' : 'none'"
+        [style.background-color]="settings().BrandingBackgroundType === 'color' ? settings().BrandingBackgroundColor : 'transparent'"
+        style="background-size: cover; background-position: center;">
+        <div class="text-left max-w-[400px] w-full">
+          <div class="mb-5 logo-preview overflow-hidden max-h-[120px] flex items-center"
+            [innerHTML]="sanitizedPreviewLogo()"></div>
+          <h1 class="text-2xl mb-1 text-text-main">{{ settings().WelcomeTitle || 'Welcome!' }}</h1>
+          <div class="text-sm text-text-muted uppercase tracking-widest mb-3 font-semibold opacity-80">
+            {{ settings().WelcomeTagline || 'Matchmaking 2026' }}
+          </div>
+          <div class="text-sm text-text-muted leading-snug description-content"
+            [innerHTML]="settings().WelcomeDescription || 'Description will appear here...'"></div>
+          <button
+            class="mt-4 bg-[var(--accent)] text-white border-none rounded-lg px-6 py-3 text-sm font-semibold opacity-85 cursor-default">
+            {{ settings().WelcomeButton || 'Start matchmaking' }} →
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ===== ROLE SELECTION TAB ===== -->
+    @if (activeTab() === 'roles') {
+    <div class="panel">
+      <h2 class="panel-title"><span>👥</span> Role Selection Step</h2>
+
+      @if (isLoading()) {
+      <div class="animate-pulse flex flex-col gap-5 py-2">
+        @for (i of [1,2,3]; track i) {
+        <div class="flex flex-col gap-2">
+          <div class="h-3 bg-white/10 rounded w-1/3"></div>
+          <div class="h-14 bg-white/[0.06] rounded-xl w-full"></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="flex flex-col gap-8">
+        <!-- Toggle Section -->
+        <div class="bg-white/[0.03] border border-white/10 rounded-xl p-6">
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="relative inline-flex items-center">
+              <input type="checkbox" class="sr-only peer" [checked]="settings().RoleSelectionEnabled === 'true'"
+                (change)="settings().RoleSelectionEnabled = $any($event.target).checked ? 'true' : 'false'">
+              <div
+                class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent group-hover:bg-white/20">
+              </div>
+            </div>
+            <span class="text-base font-medium text-text-main group-hover:text-white transition-colors">Enable Role
+              Selection Step</span>
+          </label>
+          <p class="text-sm text-text-muted mt-3 ml-14 leading-relaxed">
+            If enabled, participants will be presented with a role selection screen (e.g. Student or Company) before
+            starting the survey.
+          </p>
+        </div>
+
+        <!-- Custom Text Section -->
+        <div class="flex flex-col gap-6">
+          <h3 class="text-base font-semibold text-green border-b border-white/10 pb-2">📄 Page Header</h3>
+          <div class="input-group">
+            <label>Selection Page Title</label>
+            <input type="text" [(ngModel)]="settings().RoleSelectionTitle" placeholder="Who are you?">
+          </div>
+          <div class="input-group">
+            <label>Selection Page Description</label>
+            <textarea [(ngModel)]="settings().RoleSelectionDescription"
+              placeholder="Select your role to get the most relevant matches..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Role Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Student Role -->
+          <div class="flex flex-col gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-xl">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-accent flex items-center gap-2">
+              <span class="material-icons text-base">school</span> Student Role
+            </h3>
+            <div class="input-group">
+              <label>Role Name</label>
+              <input type="text" [(ngModel)]="settings().RoleStudentName" placeholder="Student">
+            </div>
+            <div class="input-group">
+              <label>Role Description</label>
+              <textarea [(ngModel)]="settings().RoleStudentDescription" placeholder="Looking for internship..."
+                rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Company Role -->
+          <div class="flex flex-col gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-xl">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-accent flex items-center gap-2">
+              <span class="material-icons text-base">business</span> Company Role
+            </h3>
+            <div class="input-group">
+              <label>Role Name</label>
+              <input type="text" [(ngModel)]="settings().RoleCompanyName" placeholder="Company / Exhibitor">
+            </div>
+            <div class="input-group">
+              <label>Role Description</label>
+              <textarea [(ngModel)]="settings().RoleCompanyDescription" placeholder="Looking for new talent..."
+                rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- ===== DATA TAB ===== -->
+    @if (activeTab() === 'data') {
+    <div class="panel">
+      <h2 class="panel-title"><span>🛠️</span> Data Management</h2>
+      <div class="flex flex-col sm:flex-row gap-3 flex-wrap mt-4">
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="mapInput.click()"
+          [disabled]="isProcessing()" title="Upload AI-enriched CSV to export ID matches">
+          🔁 Export ID Matches (CSV)
+        </button>
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="matchesInput.click()"
+          [disabled]="isProcessing()">
+          📥 Import Matches (XLSX/CSV)
+        </button>
+        <div class="w-full h-px bg-white/5 my-2"></div>
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="seedData()"
+          [disabled]="isProcessing()">
+          🧪 Create Test Data
+        </button>
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="resetMatches()"
+          [disabled]="isProcessing()">
+          🗑️ Clear Matches
+        </button>
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="exportRegistrations()"
+          [disabled]="totalCount() === 0 || isProcessing()">
+          📥 Export Data (CSV)
+        </button>
+        <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="exportMatchesExcel()"
+          [disabled]="isProcessing()">
+          📊 Export Matches (Excel)
+        </button>
+      </div>
+    </div>
+    }
+
+
+    <!-- ===== EMAIL TAB (TEMPLATES ONLY) ===== -->
+    @if (activeTab() === 'email') {
+    <div class="panel flex flex-col gap-5">
+      <h2 class="panel-title"><span>📧</span> Email Templates</h2>
+      <p class="text-text-muted -mt-2">Configure the content of the emails sent to participants.</p>
+
+      <!-- Invitation Template -->
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+          <h3 class="text-base font-semibold text-green m-0">✉️ Invitation Email</h3>
+          <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="sendTestEmail('invitation')"
+            [style.color]="settings().BrandingPrimaryColor" [style.border-color]="settings().BrandingPrimaryColor"
+            [disabled]="isSaving()">
+            <span class="material-icons text-base mr-1">send</span> Test Email
+          </button>
+        </div>
+        <p class="text-[11px] text-text-muted -mt-2 mb-3">
+          Supported variables: <code>{{'{'}}{{'{'}}ParticipantName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}CompanyName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}MatchmakingLink{{'}'}}{{'}'}}</code>.
+        </p>
+        <div class="input-group mb-4">
+          <label>Subject</label>
+          <input type="text" [(ngModel)]="settings().InvitationEmailSubject"
+            placeholder="e.g. Maximize your networking...">
+        </div>
+        <div class="input-group">
+          <app-rich-text-editor [(ngModel)]="settings().InvitationEmailTemplate"></app-rich-text-editor>
+        </div>
+      </div>
+
+      <!-- Result Template -->
+      <div class="mt-4 pt-6 border-t border-white/10">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+          <h3 class="text-base font-semibold text-green m-0">📊 Result Email</h3>
+          <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="sendTestEmail('result')"
+            [style.color]="settings().BrandingPrimaryColor" [style.border-color]="settings().BrandingPrimaryColor"
+            [disabled]="isSaving()">
+            <span class="material-icons text-base mr-1">send</span> Test Email
+          </button>
+        </div>
+        <p class="text-[11px] text-text-muted -mt-2 mb-3">
+          Supported variables: <code>{{'{'}}{{'{'}}ParticipantName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}CompanyName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}ResultsTable{{'}'}}{{'}'}}</code>.
+        </p>
+        <div class="input-group mb-4">
+          <label>Subject</label>
+          <input type="text" [(ngModel)]="settings().ResultEmailSubject"
+            placeholder="e.g. Your personal matches are ready!">
+        </div>
+        <div class="input-group">
+          <app-rich-text-editor [(ngModel)]="settings().ResultEmailTemplate"></app-rich-text-editor>
+        </div>
+      </div>
+
+      <!-- Feedback Template -->
+      <div class="mt-4 pt-6 border-t border-white/10">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+          <h3 class="text-base font-semibold text-green m-0">💬 Feedback Request Email</h3>
+          <button class="btn btn-sm btn-highlight w-full sm:w-auto justify-center" (click)="sendTestEmail('feedback')"
+            [style.color]="settings().BrandingPrimaryColor" [style.border-color]="settings().BrandingPrimaryColor"
+            [disabled]="isSaving()">
+            <span class="material-icons text-base mr-1">send</span> Test Email
+          </button>
+        </div>
+        <p class="text-[11px] text-text-muted -mt-2 mb-3">
+          Supported variables: <code>{{'{'}}{{'{'}}ParticipantName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}CompanyName{{'}'}}{{'}'}}</code>,
+          <code>{{'{'}}{{'{'}}ResultsLink{{'}'}}{{'}'}}</code>.
+        </p>
+        <div class="input-group mb-4">
+          <label>Subject</label>
+          <input type="text" [(ngModel)]="settings().FeedbackEmailSubject"
+            placeholder="e.g. How was your matchmaking experience?">
+        </div>
+        <div class="input-group">
+          <app-rich-text-editor [(ngModel)]="settings().FeedbackEmailTemplate"></app-rich-text-editor>
+        </div>
+      </div>
+
+      <!-- Save button removed from here, now in sticky footer -->
+    </div>
+    }
+
+    <!-- ===== ADMIN MANAGEMENT TAB ===== -->
+    @if (activeTab() === 'admins') {
+    <div class="panel col-span-1 lg:col-span-2">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="panel-title m-0"><span>🛡️</span> Admin Management</h2>
+        <button class="btn btn-primary btn-sm" (click)="openAddAdmin()">
+          <span class="material-icons text-base mr-1">person_add</span> Add Admin
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse border-white/5">
+          <thead>
+            <tr class="border-b border-white/10 text-text-muted text-xs uppercase tracking-wider">
+              <th class="py-3 px-4 font-semibold">Name</th>
+              <th class="py-3 px-4 font-semibold">Email</th>
+              <th class="py-3 px-4 font-semibold">Role</th>
+              <th class="py-3 px-4 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm text-text-main">
+            @for (admin of admins(); track admin.id) {
+            <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+              <td class="py-3 px-4">
+                <div class="font-medium">{{ admin.firstName }} {{ admin.lastName }}</div>
+              </td>
+              <td class="py-3 px-4 text-text-muted">
+                {{ admin.email }}
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-tight" [ngClass]="{
+                      'bg-accent/20 text-accent border border-accent/30': admin.role === 'SuperAdmin',
+                      'bg-green/10 text-green border border-green/20': admin.role === 'Admin'
+                    }">
+                  {{ admin.role }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-right">
+                <div class="flex justify-end gap-2">
+                  <button class="p-1.5 hover:bg-white/10 rounded-lg text-text-muted transition-all"
+                    (click)="openEditAdmin(admin)" title="Edit Admin">
+                    <span class="material-icons text-base">edit</span>
+                  </button>
+                  <button class="p-1.5 hover:bg-red-500/10 rounded-lg text-red-400 transition-all"
+                    (click)="removeAdmin(admin.id)" title="Remove Admin">
+                    <span class="material-icons text-base">person_remove</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="4" class="py-10 text-center text-text-muted italic">
+                No admins found for this project.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+
+  <!-- ===== SCHEDULE CONFIGURATION TAB ===== -->
+  @if (activeTab() === 'schedule') {
+  <div class="panel col-span-1 lg:col-span-2">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="panel-title m-0"><span>📅</span> Event Schedule Configuration</h2>
+    </div>
+
+    <!-- Enable / Disable Schedule Toggle -->
+    <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5 mb-6"
+      [style.border-color]="scheduleSettings().isActive ? 'var(--accent)' : 'rgba(255,255,255,0.1)'">
+
+      <!-- Clickable row -->
+      <div class="flex items-center justify-between cursor-pointer select-none"
+        (click)="toggleScheduleActive(!scheduleSettings().isActive)">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-semibold text-white">Enable Schedule Feature</span>
+          <span class="text-sm text-text-muted leading-relaxed">
+            When enabled, companies can have meeting time slots generated for them.
+            Disable to hide the schedule system entirely.
+          </span>
+        </div>
+        <!-- Toggle pill -->
+        <div class="ml-6 shrink-0 w-12 h-6 rounded-full transition-all duration-200 flex items-center px-0.5"
+          [style.background-color]="scheduleSettings().isActive ? 'var(--accent)' : 'rgba(255,255,255,0.15)'">
+          <div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
+            [style.transform]="scheduleSettings().isActive ? 'translateX(24px)' : 'translateX(0)'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Status badge -->
+      <div class="mt-3 flex items-center gap-2">
+        @if (scheduleSettings().isActive) {
+          <span class="flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1"
+            style="color:#34d399;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25)">
+            <span class="w-1.5 h-1.5 rounded-full inline-block" style="background:#34d399"></span>
+            Active
+          </span>
+          <span class="text-xs text-text-muted">Meeting slots will be available for generation.</span>
+        } @else {
+          <span class="flex items-center gap-1.5 text-xs font-semibold rounded-full px-2.5 py-1"
+            style="color:#94a3b8;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+            <span class="w-1.5 h-1.5 rounded-full inline-block" style="background:#94a3b8"></span>
+            Disabled
+          </span>
+          <span class="text-xs text-text-muted">Schedule and slot generation are turned off.</span>
+        }
+      </div>
+    </div>
+
+    <!-- Time Configuration (dimmed when disabled) -->
+    <div [class.opacity-40]="!scheduleSettings().isActive" [class.pointer-events-none]="!scheduleSettings().isActive"
+      class="transition-opacity duration-200">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="input-group">
+          <label>Event Start Time</label>
+          <input type="time" [(ngModel)]="scheduleSettings().eventStartTime"
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+        <div class="input-group">
+          <label>Event End Time</label>
+          <input type="time" [(ngModel)]="scheduleSettings().eventEndTime"
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+
+        <div class="input-group md:col-span-2">
+          <label>Slot Duration (Minutes)</label>
+          <input type="number" [(ngModel)]="scheduleSettings().slotDurationMinutes" placeholder="30"
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+
+        <div class="col-span-1 md:col-span-2 mt-2">
+          <h3 class="text-sm font-semibold text-accent mb-3">Optional: Global Break/Lunch</h3>
+        </div>
+
+        <div class="input-group">
+          <label>Break Start Time</label>
+          <input type="time" [(ngModel)]="scheduleSettings().breakStartTime"
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+        <div class="input-group">
+          <label>Break End Time</label>
+          <input type="time" [(ngModel)]="scheduleSettings().breakEndTime"
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-end">
+      <button class="btn btn-primary px-6" (click)="saveScheduleSettings()" [disabled]="isSaving()">
+        @if (isSaving()) {
+          <span class="material-icons rotating text-xs mr-2">sync</span> Saving...
+        } @else {
+          <span class="material-icons text-base mr-2">save</span> Save Schedule
+        }
+      </button>
+    </div>
+  </div>
+  }
+  </div>
+
+  <input type="file" #csvInput class="hidden" (change)="onCsvSelected($event)" accept=".csv">
+  <input type="file" #matchesInput class="hidden" (change)="onMatchesFileSelected($event)" accept=".csv,.xlsx">
+  <input type="file" #mapInput class="hidden" (change)="onMapFileSelected($event)" accept=".csv">
+
+  <!-- System Wide Actions Footer -->
+  @if (activeTab() !== 'data' && activeTab() !== 'admins') {
+  <div
+    class="fixed bottom-0 left-0 right-0 w-screen max-w-[100vw] py-4 sm:py-5 bg-[#05131b]/95 backdrop-blur-2xl border-t border-white/10 z-[100] actions-floating">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end items-center gap-3 w-full">
+        <button
+          class="btn btn-outline !border-white/20 !text-white !bg-white/5 hover:!bg-white/10 w-full sm:w-auto transition-all"
+          (click)="previewSurvey()">
+          👁️ Preview Survey
+        </button>
+
+
+        <!-- Conditionally show Save changes button when there are settings to save -->
+        @if (activeTab() === 'design' || activeTab() === 'text' || activeTab() === 'roles' || activeTab() === 'email') {
+        <button class="btn btn-primary w-full sm:w-auto sm:px-12"
+          [style.background-color]="settings().BrandingPrimaryColor"
+          [style.border-color]="settings().BrandingPrimaryColor" (click)="save()">
+          <span class="material-icons mr-2">save</span> Save changes
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>
+
+<!-- Confirm Modal -->
+@if (showConfirmModal()) {
+<div
+  class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4 animate-[fadeInModal_0.2s_ease-out]"
+  (click)="closeConfirm()">
+  <div
+    class="bg-[#1e293b] border border-white/10 rounded-2xl p-6 max-w-[450px] w-full shadow-2xl animate-[scaleInModal_0.2s_cubic-bezier(0.16,1,0.3,1)]"
+    (click)="$event.stopPropagation()">
+    <h3 class="text-xl font-semibold text-white mb-4">{{ confirmTitle() }}</h3>
+    <p class="text-slate-300 leading-relaxed mb-6 text-[15px]">{{ confirmMessage() }}</p>
+    <div class="flex justify-end gap-3">
+      <button class="btn-cancel" (click)="closeConfirm()">Cancel</button>
+      <button class="btn-confirm" (click)="onConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Admin Modal -->
+@if (showAdminModal()) {
+<div
+  class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4 animate-[fadeInModal_0.2s_ease-out]"
+  (click)="closeAdminModal()">
+  <div
+    class="bg-[#1e293b] border border-white/10 rounded-2xl p-6 max-w-[450px] w-full shadow-2xl animate-[scaleInModal_0.2s_cubic-bezier(0.16,1,0.3,1)]"
+    (click)="$event.stopPropagation()">
+    <h3 class="text-xl font-semibold text-white mb-6">
+      {{ isEditMode() ? 'Edit Administrator' : 'Add New Administrator' }}
+    </h3>
+
+    <div class="flex flex-col gap-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="input-group">
+          <label>First Name</label>
+          <input type="text" [(ngModel)]="adminForm().firstName" placeholder="John" class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+        <div class="input-group">
+          <label>Last Name</label>
+          <input type="text" [(ngModel)]="adminForm().lastName" placeholder="Doe" class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" [(ngModel)]="adminForm().email" placeholder="john.doe@example.com"
+          [disabled]="isEditMode()" class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent disabled:opacity-50">
+        @if (!isEditMode()) {
+        <p class="text-[10px] text-text-muted mt-1 italic">Note: If user doesn't exist, an account will be created.</p>
+        }
+      </div>
+
+      <div class="input-group">
+        <label>Role</label>
+        <select [(ngModel)]="adminForm().role"
+          class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent transition-all appearance-none cursor-pointer">
+          <option value="Admin">Project Admin</option>
+          @if (currentUserRole() === 'SuperAdmin') {
+          <option value="SuperAdmin">SuperAdmin</option>
+          }
+        </select>
+        <p class="text-[10px] text-text-muted mt-1 leading-snug">
+          Admin: Full access to this specific project.<br>
+          SuperAdmin: Full access to ALL projects in the system.
+        </p>
+      </div>
+
+      <!-- Password Field - Always for NEW, only for SuperAdmin if EDIT -->
+      @if (!isEditMode() || currentUserRole() === 'SuperAdmin') {
+        <div class="input-group">
+          <label>Password {{ isEditMode() ? '(Leave blank to keep current)' : '' }}</label>
+          <input type="password" [(ngModel)]="adminForm().password" placeholder="••••••••" 
+            class="w-full bg-[#0f172a] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-accent">
+          @if (!isEditMode()) {
+            <p class="text-[10px] text-text-muted mt-1 italic">Default: InitialPassword123!</p>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="flex justify-end gap-3 mt-8">
+      <button class="btn btn-outline-danger btn-sm" (click)="closeAdminModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm px-6" (click)="saveAdmin()" [disabled]="isAdminSaving()">
+        @if (isAdminSaving()) {
+        <span class="material-icons rotating text-xs mr-2">sync</span> Saving...
+        } @else {
+        <span class="material-icons text-base mr-2">save</span> {{ isEditMode() ? 'Update' : 'Save' }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Processing Modal -->
+@if (isProcessing()) {
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
+  <div class="bg-[#1e293b] border border-white/10 rounded-2xl p-6 max-w-[450px] w-full shadow-2xl"
+    (click)="$event.stopPropagation()">
+    <h3 class="flex items-center gap-2.5 text-xl font-semibold text-white mb-4">
+      <span class="material-icons rotating">sync</span> {{ processingMessage() }}
+    </h3>
+    <p class="text-slate-300 leading-relaxed mb-4 text-[15px]">Please wait while the system processes your request.</p>
+    <div class="flex justify-center mb-4">
+      <button class="btn btn-sm btn-outline-danger" (click)="cancelProcessing()">
+        <span class="material-icons text-sm mr-1">close</span> Cancel
+      </button>
+    </div>
+    <div class="w-full h-2 bg-white/10 rounded overflow-hidden mt-4">
+      <div class="h-full bg-[#31a2ae] rounded transition-all duration-300" [style.width.%]="processingProgress()"></div>
+    </div>
+    <div class="text-center text-sm text-slate-400 mt-2 font-semibold">
+      {{ processingProgress() }}%
+    </div>
+  </div>
+</div>
+}

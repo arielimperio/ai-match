@@ -1,0 +1,288 @@
+﻿{
+    "value":  [
+                  {
+                      "id":  "q1",
+                      "title":  "Min Superkraft",
+                      "description":  "Inom vilket område kan du bidra med mest värde till andra välja upp till två alternativ.",
+                      "placeholder":  null,
+                      "isHidden":  false,
+                      "type":  "MultipleChoice",
+                      "options":  [
+                                      {
+                                          "id":  1,
+                                          "questionId":  "q1",
+                                          "value":  "sales",
+                                          "icon":  "🚀",
+                                          "title":  "Försäljning \u0026 Marknad",
+                                          "description":  "Hjälper andra att växa och sälja mer.",
+                                          "order":  1,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  2,
+                                          "questionId":  "q1",
+                                          "value":  "tech",
+                                          "icon":  "💻",
+                                          "title":  "Teknik \u0026 IT",
+                                          "description":  "Expert på digitala lösningar och AI.",
+                                          "order":  2,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  3,
+                                          "questionId":  "q1",
+                                          "value":  "strat",
+                                          "icon":  "🎯",
+                                          "title":  "Strategi \u0026 Ledarskap",
+                                          "description":  "Bygger organisationer och team.",
+                                          "order":  3,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  4,
+                                          "questionId":  "q1",
+                                          "value":  "sust",
+                                          "icon":  "🌿",
+                                          "title":  "Hållbarhet",
+                                          "description":  "Drivkraft för grön omställning.",
+                                          "order":  4,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  5,
+                                          "questionId":  "q1",
+                                          "value":  "other",
+                                          "icon":  "✨",
+                                          "title":  "Annat...",
+                                          "description":  "Skriv din egen superkraft.",
+                                          "order":  5,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  15,
+                                          "questionId":  "q1",
+                                          "value":  "invest",
+                                          "icon":  "✨",
+                                          "title":  "Kapital \u0026 Investering",
+                                          "description":  "Hittar rätt bolag och ser till att de ökar i värde",
+                                          "order":  6,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  16,
+                                          "questionId":  "q1",
+                                          "value":  "health",
+                                          "icon":  "✨",
+                                          "title":  "Hälsa \u0026 Friskvård",
+                                          "description":  "Hjälper människor att må bättre och prestera mer.",
+                                          "order":  7,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  17,
+                                          "questionId":  "q1",
+                                          "value":  "facility",
+                                          "icon":  "✨",
+                                          "title":  "Lokaler \u0026 Arbetsplatser",
+                                          "description":  "Skapar arbetsplatser där människor trivs och presterar bättre.",
+                                          "order":  8,
+                                          "isHidden":  false
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "q2",
+                      "title":  "Min Utmaning",
+                      "description":  "Vad är den största utmaningen du vill lösa just nu? max 2 stycken alternativ.",
+                      "placeholder":  null,
+                      "isHidden":  false,
+                      "type":  "MultipleChoice",
+                      "options":  [
+                                      {
+                                          "id":  6,
+                                          "questionId":  "q2",
+                                          "value":  "leads",
+                                          "icon":  "📈",
+                                          "title":  "Hitta nya kunder",
+                                          "description":  "Söker leads och nya marknader.",
+                                          "order":  1,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  7,
+                                          "questionId":  "q2",
+                                          "value":  "partners",
+                                          "icon":  "🤝",
+                                          "title":  "Nätverk \u0026 Partners",
+                                          "description":  "Söker strategiska samarbeten.",
+                                          "order":  2,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  8,
+                                          "questionId":  "q2",
+                                          "value":  "talent",
+                                          "icon":  "✨",
+                                          "title":  "Rekrytera talang",
+                                          "description":  "Behöver stärka upp teamet.",
+                                          "order":  3,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  9,
+                                          "questionId":  "q2",
+                                          "value":  "funding",
+                                          "icon":  "💰",
+                                          "title":  "Kapital \u0026 Finansiering",
+                                          "description":  "Söker investering eller stöd.",
+                                          "order":  4,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  10,
+                                          "questionId":  "q2",
+                                          "value":  "other",
+                                          "icon":  "🏢",
+                                          "title":  "Annat...",
+                                          "description":  "Berätta om din utmaning.",
+                                          "order":  5,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  18,
+                                          "questionId":  "q2",
+                                          "value":  "facility",
+                                          "icon":  "✨",
+                                          "title":  "Lokal \u0026 Mark",
+                                          "description":  "Att hitta rätt mark och lokaler för att din verksamhet ska kunna växa.",
+                                          "order":  6,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  19,
+                                          "questionId":  "q2",
+                                          "value":  "sales",
+                                          "icon":  "✨",
+                                          "title":  "Sälj \u0026 Marknadsföring",
+                                          "description":  "Att nå fram i bruset och förvandla kontakter till betalande kunder.",
+                                          "order":  7,
+                                          "isHidden":  false
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "q3",
+                      "title":  "Samtalsämnen",
+                      "description":  "Vad snackar du helst om vid kaffemaskinen?",
+                      "placeholder":  null,
+                      "isHidden":  false,
+                      "type":  "MultipleChoice",
+                      "options":  [
+                                      {
+                                          "id":  11,
+                                          "questionId":  "q3",
+                                          "value":  "ai",
+                                          "icon":  "🤖",
+                                          "title":  "AI-revolutionen",
+                                          "description":  "Möjligheter och hot.",
+                                          "order":  1,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  12,
+                                          "questionId":  "q3",
+                                          "value":  "local",
+                                          "icon":  "📍",
+                                          "title":  "Nackas framtid",
+                                          "description":  "Lokal tillväxt och miljö.",
+                                          "order":  2,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  13,
+                                          "questionId":  "q3",
+                                          "value":  "future",
+                                          "icon":  "🛸",
+                                          "title":  "Framtidens jobb",
+                                          "description":  "Hybridarbete och kultur.",
+                                          "order":  3,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  14,
+                                          "questionId":  "q3",
+                                          "value":  "other",
+                                          "icon":  "☕",
+                                          "title":  "Annat...",
+                                          "description":  "Vad brinner du för?",
+                                          "order":  4,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  20,
+                                          "questionId":  "q3",
+                                          "value":  "circular",
+                                          "icon":  "✨",
+                                          "title":  "Cirkulär ekonomi",
+                                          "description":  "Maximera resursutnyttjandet.",
+                                          "order":  5,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  21,
+                                          "questionId":  "q3",
+                                          "value":  "growth",
+                                          "icon":  "✨",
+                                          "title":  "Tillväxt",
+                                          "description":  "Hitta nästa växel snabbt.",
+                                          "order":  6,
+                                          "isHidden":  false
+                                      },
+                                      {
+                                          "id":  22,
+                                          "questionId":  "q3",
+                                          "value":  "rome",
+                                          "icon":  "✨",
+                                          "title":  "”Romarriket”",
+                                          "description":  "Skala upp hållbart imperium.",
+                                          "order":  7,
+                                          "isHidden":  false
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "q4",
+                      "title":  "Kort om dig",
+                      "description":  "Mitt mål med företagandet 2026?",
+                      "placeholder":  "T.ex. Jag vill expandera min konsultverksamhet till norra Europa...",
+                      "isHidden":  false,
+                      "type":  "Text",
+                      "options":  [
+
+                                  ]
+                  },
+                  {
+                      "id":  "q5",
+                      "title":  "Mina uppgifter",
+                      "description":  "Kontrollera att dina uppgifter stämmer så att andra kan hitta dig på mässan.",
+                      "placeholder":  null,
+                      "isHidden":  false,
+                      "type":  "Profile",
+                      "options":  [
+
+                                  ]
+                  },
+                  {
+                      "id":  "q6",
+                      "title":  "Kort om företaget",
+                      "description":  "Beskriv företaget där du jobbar, max en mening 50 tkn.",
+                      "placeholder":  null,
+                      "isHidden":  false,
+                      "type":  "Text",
+                      "options":  [
+
+                                  ]
+                  }
+              ],
+    "Count":  6
+}
